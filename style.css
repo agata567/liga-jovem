@@ -1,0 +1,261 @@
+/* Definição de Cores */
+:root {
+    --azul-principal: #007bff; /* Azul vibrante para links e botões */
+    --azul-escuro: #0056b3;
+    --preto-texto: #1a1a1a;
+    --cinza-fundo: #f4f4f4; /* Fundo cinza claro */
+    --cinza-borda: #ccc;
+    --branco: #ffffff;
+}
+
+body {
+    font-family: 'Roboto', Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--cinza-fundo);
+    color: var(--preto-texto);
+    font-size: 14px;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+a {
+    text-decoration: none;
+    color: var(--azul-principal);
+}
+
+/* --- TOPO ACESSIBILIDADE (Fundo Preto/Cinza) --- */
+.header-topo {
+    background-color: #333; /* Cinza Escuro */
+    color: var(--branco);
+    padding: 5px 0;
+    font-size: 12px;
+}
+
+.container-topo {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-start; /* Alinhamento para a esquerda como no modelo */
+}
+
+.acessibilidade {
+    color: var(--branco);
+    margin-right: 15px;
+}
+.acessibilidade:hover {
+    color: var(--azul-principal);
+}
+
+
+/* --- CABEÇALHO PRINCIPAL (Logo e Links) --- */
+.header-principal {
+    background-color: var(--branco);
+    border-bottom: 1px solid var(--cinza-borda);
+}
+
+.header-principal .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.logo-escola {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    width: 50px; /* Tamanho do logo */
+    height: auto;
+    margin-right: 15px;
+}
+
+.nome-projeto {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: var(--preto-texto);
+}
+
+.links-superiores a {
+    color: var(--preto-texto);
+    margin-left: 15px;
+}
+
+/* Linha de destaque (Amarela no Correios, aqui vamos de Cinza/Azul) */
+.linha-destaque {
+    height: 5px;
+    background-color: var(--cinza-fundo);
+    /* Se quiser uma cor mais chamativa: background-color: #ffc107; (Amarelo) */
+    border-top: 1px solid var(--cinza-borda);
+}
+
+/* --- ÁREA DE TRABALHO (Menu Lateral + Conteúdo) --- */
+.area-trabalho {
+    display: flex;
+    padding: 20px 0;
+}
+
+/* MENU LATERAL */
+.menu-lateral {
+    width: 250px;
+    padding-right: 20px;
+    border-right: 1px solid var(--cinza-borda);
+}
+
+.menu-lateral h2 {
+    font-size: 1.2em;
+    color: var(--preto-texto);
+    margin-top: 0;
+    border-bottom: 2px solid var(--cinza-borda);
+    padding-bottom: 5px;
+    margin-bottom: 10px;
+}
+
+.links-sistemas a {
+    display: block;
+    padding: 8px 0;
+    color: var(--preto-texto);
+    border-left: 5px solid transparent;
+    padding-left: 10px;
+    margin-bottom: 3px;
+}
+
+.links-sistemas a.ativo {
+    background-color: var(--azul-principal);
+    color: var(--branco);
+    border-left: 5px solid var(--azul-escuro);
+    font-weight: bold;
+}
+
+.links-sistemas a:not(.ativo):hover {
+    background-color: var(--cinza-fundo);
+    border-left: 5px solid var(--cinza-borda);
+}
+
+/* CONTEÚDO CENTRAL */
+.conteudo-central {
+    flex-grow: 1;
+    padding-left: 30px;
+}
+
+.conteudo-central h1 {
+    font-size: 1.8em;
+    color: var(--azul-escuro);
+    border-bottom: 2px solid var(--cinza-borda);
+    padding-bottom: 5px;
+    margin-top: 0;
+}
+
+/* FORMULÁRIO DE BUSCA (A caixa com borda azul) */
+.formulario-busca {
+    border: 1px solid var(--azul-principal); /* Borda Azul */
+    padding: 20px;
+    background-color: var(--branco);
+    margin-top: 20px;
+}
+
+.campo-obrigatorio {
+    background-color: #e9f4ff; /* Azul muito claro */
+    color: var(--preto-texto);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px dashed var(--azul-principal);
+}
+
+/* Estilos de Formulário */
+label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+input[type="text"], select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid var(--cinza-borda);
+    box-sizing: border-box; /* Inclui padding e border na largura total */
+}
+
+/* Botões do Formulário */
+.botoes-form {
+    margin-top: 20px;
+    text-align: right;
+}
+
+.botoes-form button {
+    padding: 8px 20px;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    border-radius: 3px;
+}
+
+.btn-limpar {
+    background-color: var(--cinza-borda);
+    color: var(--preto-texto);
+}
+
+.btn-pesquisar {
+    background-color: var(--azul-principal);
+    color: var(--branco);
+}
+
+.btn-pesquisar:hover {
+    background-color: var(--azul-escuro);
+}
+
+/* Link de Destaque */
+.link-destaque {
+    font-weight: bold;
+}
+
+/* --- RODAPÉ --- */
+.rodape {
+    background-color: var(--cinza-fundo);
+    border-top: 1px solid var(--cinza-borda);
+    padding-top: 20px;
+    margin-top: 40px;
+}
+
+.rodape .container {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 20px;
+}
+
+.rodape .coluna {
+    width: 30%;
+}
+
+.rodape .coluna h3 {
+    font-size: 1.1em;
+    color: var(--azul-escuro);
+    border-bottom: 1px solid var(--cinza-borda);
+    padding-bottom: 5px;
+}
+
+.rodape .coluna ul {
+    list-style: none;
+    padding: 0;
+}
+
+.rodape .coluna li {
+    margin-bottom: 5px;
+}
+
+.rodape-inferior {
+    text-align: center;
+    padding: 10px 0;
+    background-color: #e0e0e0; /* Cinza um pouco mais escuro */
+    font-size: 0.85em;
+    color: #555;
+}
