@@ -1,271 +1,61 @@
 /* Definição da Nova Paleta */
 :root {
-    --azul-escuro: #2C3E50; /* Texto e Títulos */
-    --verde-agua: #00C4CC; /* Destaque e Ação */
-    --verde-agua-escuro: #009999;
-    --cinza-suave: #F0F4F8; /* Fundo de seções/cards */
-    --cinza-texto: #6B7A8C; /* Texto secundário */
-    --branco: #FFFFFF;
-}
-
-body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--branco);
-    color: var(--azul-escuro);
-    font-size: 16px;
-    line-height: 1.6;
-}
-
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-a {
-    text-decoration: none;
-    color: var(--verde-agua);
-    transition: color 0.3s;
-}
-
-a:hover {
-    color: var(--verde-agua-escuro);
-}
-
-/* --- CABEÇALHO PRINCIPAL --- */
-.header-principal {
-    background-color: var(--branco);
-    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.05); /* Sombra suave */
-    padding: 15px 0;
-}
-
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.logo-escola {
-    display: flex;
-    align-items: center;
-}
-
-.logo-icon {
-    font-size: 2em;
-    color: var(--verde-agua);
-    margin-right: 10px;
-}
-
-.nome-projeto {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--azul-escuro);
-}
-
-.links-superiores a {
-    margin-left: 20px;
-    font-weight: 600;
-    color: var(--azul-escuro);
-}
-
-.links-superiores a i {
-    margin-right: 5px;
-    color: var(--verde-agua);
-}
-
-/* --- ÁREA DE TRABALHO (Menu Lateral + Conteúdo) --- */
-.area-trabalho {
-    display: flex;
-    padding: 40px 0;
-    gap: 30px;
-}
-
-/* MENU LATERAL */
-.menu-lateral {
-    width: 250px;
-    background-color: var(--cinza-suave);
-    padding: 20px;
-    border-radius: 10px; /* Cantos arredondados */
-    height: fit-content;
-}
-
-.menu-lateral h2 {
-    font-size: 1.3em;
-    color: var(--azul-escuro);
-    border-bottom: 2px solid var(--branco);
-    padding-bottom: 10px;
-    margin-top: 0;
-    margin-bottom: 15px;
-}
-
-.menu-lateral h2 i {
-    color: var(--verde-agua);
-    margin-right: 8px;
-}
-
-.links-sistemas a {
-    display: flex;
-    align-items: center;
-    padding: 12px 10px;
-    color: var(--azul-escuro);
-    border-radius: 5px;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.links-sistemas a i {
-    margin-right: 10px;
-    font-size: 1.1em;
-}
-
-.links-sistemas a.ativo {
-    background-color: var(--verde-agua);
-    color: var(--branco);
-    box-shadow: 0 4px 6px rgba(0, 196, 204, 0.3); /* Sombra para destaque */
-}
-
-.links-sistemas a:not(.ativo):hover {
-    background-color: var(--branco);
-}
-
-/* CONTEÚDO CENTRAL */
-.conteudo-central {
-    flex-grow: 1;
-}
-
-/* BANNER HERO (Visual principal) */
-.hero-banner {
-    background-color: var(--cinza-suave);
-    padding: 40px;
-    border-radius: 10px;
-    text-align: center;
-    margin-bottom: 30px;
-}
-
-.hero-banner h2 {
-    font-size: 2.5em;
-    color: var(--azul-escuro);
-    margin-top: 0;
-}
-
-.hero-banner p {
-    color: var(--cinza-texto);
-    max-width: 700px;
-    margin: 15px auto 30px;
-}
-
-/* BOTÕES DE AÇÃO */
-.botoes-acao a {
-    padding: 12px 25px;
-    margin: 0 10px;
-    border-radius: 50px; /* Borda curva para visual moderno */
-    font-weight: 700;
-    display: inline-flex;
-    align-items: center;
-    transition: all 0.3s;
-}
-
-.botoes-acao a i {
-    margin-right: 8px;
-}
-
-.btn-principal {
-    background-color: var(--verde-agua);
-    color: var(--branco);
-    box-shadow: 0 6px 15px rgba(0, 196, 204, 0.4);
-}
-
-.btn-principal:hover {
-    background-color: var(--verde-agua-escuro);
-    transform: translateY(-2px); /* Efeito de elevação */
-}
-
-.btn-secundario {
-    background-color: var(--branco);
-    color: var(--azul-escuro);
-    border: 2px solid var(--cinza-suave);
-}
-
-.btn-secundario:hover {
-    background-color: var(--cinza-suave);
-    border-color: var(--verde-agua);
-}
-
-/* SEÇÃO DE BUSCA */
-.secao-busca h3 {
-    font-size: 1.6em;
-    color: var(--azul-escuro);
-    border-left: 5px solid var(--verde-agua);
-    padding-left: 15px;
-    margin-bottom: 20px;
-}
-
-.secao-busca h3 i {
-    color: var(--verde-agua);
-    margin-right: 10px;
-}
-
-.formulario-busca {
-    background-color: var(--branco);
-    padding: 30px;
-    border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(44, 62, 80, 0.08);
-}
-
-/* Estilos de Formulário */
-label {
-    display: block;
-    margin-top: 15px;
-    margin-bottom: 5px;
-    font-weight: 600;
-    color: var(--azul-escuro);
-}
-
-input[type="text"], select {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    box-sizing: border-box;
-    font-size: 1em;
-}
-
-/* Botões do Formulário */
-.botoes-form {
-    margin-top: 30px;
-    text-align: right;
-}
-
-.btn-pesquisar {
-    /* Reutiliza o estilo do botão principal */
-    background-color: var(--verde-agua);
-    color: var(--branco);
-    padding: 12px 25px;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    border-radius: 50px;
-    box-shadow: 0 4px 8px rgba(0, 196, 204, 0.3);
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-.btn-pesquisar:hover {
-    background-color: var(--verde-agua-escuro);
-    transform: translateY(-2px);
-}
-
-.btn-pesquisar i {
-    margin-right: 8px;
-}
-
-/* --- RODAPÉ --- */
-.rodape {
-    background-color: var(--cinza-suave);
-    color: var(--cinza-texto);
-    text-align: center;
-    padding: 20px 0;
-    margin-top: 50px;
-    font-size: 0.9em;
-}
+        --azul-escuro: #2C3E50; /* Texto e Títulos */
+        --verde-agua: #00C4CC; /* Destaque e Ação */
+        --verde-agua-escuro: #009999;
+        --cinza-suave: #F0F4F8; /* Fundo de seções/cards */
+        --cinza-texto: #6B7A8C; /* Texto secundário */
+        --branco: #FFFFFF;
+    }
+    /* ... (Seu CSS Original completo vai aqui) ... */
+    /* ... (Incluindo body, .container, a, .header-principal, .header-content, etc.) ... */
+    
+    /* --- AJUSTES ESPECÍFICOS PARA A PÁGINA --- */
+    
+    .descricao-processo {
+        background-color: var(--cinza-suave);
+        border-left: 5px solid var(--verde-agua-escuro);
+        padding: 20px;
+        border-radius: 5px;
+        color: var(--azul-escuro);
+        margin-bottom: 30px;
+    }
+    
+    .descricao-processo a {
+        font-weight: 700;
+    }
+    
+    .aviso-obrigatorio {
+        color: var(--cinza-texto);
+        font-style: italic;
+        font-size: 0.9em;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px dashed var(--cinza-suave);
+    }
+    
+    /* Ajuste do botão de limpeza para usar o estilo secundário */
+    .botoes-form .btn-secundario {
+        /* Reutiliza o estilo do botão secundário, mas o torna um botão nativo */
+        background-color: var(--branco);
+        color: var(--azul-escuro);
+        border: 2px solid var(--cinza-suave);
+        padding: 12px 25px;
+        border-radius: 50px; 
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+    
+    .botoes-form .btn-secundario:hover {
+        background-color: var(--cinza-suave);
+        border-color: var(--azul-escuro);
+        transform: none; /* remove o transform para o botão secundário */
+    }
+    
+    /* Garante que o input e select tenham o mesmo visual */
+    input[type="text"]:focus, select:focus {
+        border-color: var(--verde-agua);
+        outline: none;
+        box-shadow: 0 0 5px rgba(0, 196, 204, 0.5);
+    }

@@ -1,78 +1,101 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Achados e Perdidos | Escola 11 de Outubro</title>
-    <link rel="stylesheet" href="style-moderno.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Achados e Perdidos - Correios Moderno</title>
+    <link rel="stylesheet" href="style.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
 </head>
 <body>
 
     <header class="header-principal">
         <div class="container header-content">
             <div class="logo-escola">
-                <i class="fas fa-box-open logo-icon"></i>
-                <span class="nome-projeto">Achados e Perdidos 11 de Outubro</span>
+                <i class="fas fa-truck-fast logo-icon"></i>
+                <span class="nome-projeto">CORREIOS</span>
             </div>
-            
             <nav class="links-superiores">
-                <a href="contato.html"><i class="fas fa-headset"></i> Contato</a>
-                <a href="sobre.html"><i class="fas fa-users"></i> Sobre Nós</a>
+                <a href="#"><i class="fas fa-search"></i> Outros sites</a>
+                <a href="#"><i class="fas fa-envelope"></i> Fale com os Correios</a>
             </nav>
         </div>
     </header>
 
-    <div class="area-trabalho container" id="conteudo-principal">
-        
-        <div class="menu-lateral">
-            <h2><i class="fas fa-search-location"></i> Navegação</h2>
-            <nav class="links-sistemas">
-                <a href="index.html" class="ativo"><i class="fas fa-home"></i> Início</a>
-                <a href="achados.html"><i class="fas fa-camera"></i> Ver Achados (Galeria)</a>
-                <a href="perdidos.html"><i class="fas fa-map-marker-alt"></i> Reportar Perda</a>
-            </nav>
-        </div>
+    <div class="area-trabalho container">
 
-        <div class="conteudo-central">
+        <aside class="menu-lateral">
+            <h2><i class="fas fa-th-large"></i> Sistemas</h2>
+            <nav class="links-sistemas">
+                <a href="#" class="ativo">
+                    <i class="fas fa-box-open"></i> Achados e Perdidos
+                </a>
+                <a href="#">
+                    <i class="fas fa-shipping-fast"></i> Rastreamento
+                </a>
+                <a href="#">
+                    <i class="fas fa-calculator"></i> Cáculo de Preços e Prazos
+                </a>
+                <a href="#">
+                    <i class="fas fa-question-circle"></i> Ajuda e Suporte
+                </a>
+            </nav>
+        </aside>
+
+        <main class="conteudo-central">
             
             <section class="hero-banner">
-                <h2>Reencontre o que é seu.</h2>
-                <p>Nossa missão é conectar itens perdidos na Escola **11 de Outubro** aos seus donos. Use a busca ou veja nossa galeria.</p>
-                
+                <h2>Achados e Perdidos</h2>
+                <p>Verifique se seus documentos ou objetos perdidos estão sob nossa custódia. Encontrou algo? Faça a manifestação no link abaixo.</p>
                 <div class="botoes-acao">
-                    <a href="achados.html" class="btn-principal"><i class="fas fa-images"></i> VER GALERIA DE ACHADOS</a>
-                    <a href="perdidos.html" class="btn-secundario"><i class="fas fa-plus-circle"></i> PERDI ALGO, RELATAR</a>
+                    <a href="#" class="btn-principal"><i class="fas fa-search-dollar"></i> Verificar Achados</a>
+                    <a href="#" class="btn-secundario"><i class="fas fa-headset"></i> Fale com os Correios</a>
                 </div>
             </section>
-
+            
             <section class="secao-busca">
-                <h3><i class="fas fa-binoculars"></i> Buscar Seu Item</h3>
+                <h3><i class="fas fa-file-alt"></i> Buscar Documento Perdido</h3>
+                
+                <p class="descricao-processo">
+                    Perdeu seus documentos? Verifique primeiramente se seu nome consta na relação de achados e perdidos dos Correios.
+                    Se constar, favor contatar a agência onde estão seus documentos. Os documentos são mantidos na agência por **60 dias** contados a partir da data em que deram entrada. Após esse período, são encaminhados aos órgãos emissores.
+                    <br>No momento da retirada, você deve comprovar que é o titular do documento e pagar a taxa (
+                    <a href="#">verifique o valor da taxa</a>).
+                </p>
+                
                 <div class="formulario-busca">
-                    <form action="buscar.php" method="POST">
-                        <label for="tipo_documento">Qual o tipo de item que você perdeu?</label>
-                        <select id="tipo_documento" name="tipo_documento" required>
-                            <option value="">-- Selecione a Categoria --</option>
-                            <option value="chave">Chaves/Chaveiro</option>
-                            <option value="celular">Eletrônicos (Celular, Fone)</option>
-                            </select>
+                    
+                    <p class="aviso-obrigatorio">Os campos assinalados com (*) são obrigatórios</p>
 
-                        <label for="nome_completo">Descreva brevemente seu item (Ex: Caneta vermelha, Casaco cinza) *</label>
-                        <input type="text" id="nome_completo" name="nome_completo" required placeholder="Ex: Mochila preta com adesivo de gatinho">
+                    <form action="#" method="post">
+                        
+                        <label for="tipo-documento">Informe o tipo de documento *</label>
+                        <select id="tipo-documento" name="tipo-documento" required>
+                            <option value="">-- Favor escolher --</option>
+                            <option value="rg">RG (Registro Geral)</option>
+                            <option value="cnh">CNH (Carteira de Motorista)</option>
+                            <option value="cpf">CPF</option>
+                            <option value="titulo">Título de Eleitor</option>
+                            <option value="outros">Outros Documentos/Objetos</option>
+                        </select>
+
+                        <label for="nome-completo">Informe o nome completo *</label>
+                        <input type="text" id="nome-completo" name="nome-completo" required placeholder="Digite seu nome completo...">
 
                         <div class="botoes-form">
-                            <button type="submit" class="btn-pesquisar"><i class="fas fa-search"></i> PESQUISAR</button>
+                            <button type="reset" class="btn-secundario" style="margin-right: 10px;">Limpar</button>
+                            <button type="submit" class="btn-pesquisar"><i class="fas fa-search"></i> Pesquisar</button>
                         </div>
                     </form>
                 </div>
             </section>
-        </div>
+
+        </main>
     </div>
 
     <footer class="rodape">
         <div class="container">
-            <p>&copy; 2025 Achados e Perdidos 11 de Outubro | Um projeto da comunidade escolar.</p>
+            © 2025 Correios. Todos os direitos reservados.
         </div>
     </footer>
 
