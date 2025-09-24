@@ -1,20 +1,21 @@
-/* Definição de Cores */
+/* Definição da Nova Paleta */
 :root {
-    --azul-principal: #007bff; /* Azul vibrante para links e botões */
-    --azul-escuro: #0056b3;
-    --preto-texto: #1a1a1a;
-    --cinza-fundo: #f4f4f4; /* Fundo cinza claro */
-    --cinza-borda: #ccc;
-    --branco: #ffffff;
+    --azul-escuro: #2C3E50; /* Texto e Títulos */
+    --verde-agua: #00C4CC; /* Destaque e Ação */
+    --verde-agua-escuro: #009999;
+    --cinza-suave: #F0F4F8; /* Fundo de seções/cards */
+    --cinza-texto: #6B7A8C; /* Texto secundário */
+    --branco: #FFFFFF;
 }
 
 body {
-    font-family: 'Roboto', Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: var(--cinza-fundo);
-    color: var(--preto-texto);
-    font-size: 14px;
+    background-color: var(--branco);
+    color: var(--azul-escuro);
+    font-size: 16px;
+    line-height: 1.6;
 }
 
 .container {
@@ -25,45 +26,25 @@ body {
 
 a {
     text-decoration: none;
-    color: var(--azul-principal);
+    color: var(--verde-agua);
+    transition: color 0.3s;
 }
 
-/* --- TOPO ACESSIBILIDADE (Fundo Preto/Cinza) --- */
-.header-topo {
-    background-color: #333; /* Cinza Escuro */
-    color: var(--branco);
-    padding: 5px 0;
-    font-size: 12px;
+a:hover {
+    color: var(--verde-agua-escuro);
 }
 
-.container-topo {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
-    display: flex;
-    justify-content: flex-start; /* Alinhamento para a esquerda como no modelo */
-}
-
-.acessibilidade {
-    color: var(--branco);
-    margin-right: 15px;
-}
-.acessibilidade:hover {
-    color: var(--azul-principal);
-}
-
-
-/* --- CABEÇALHO PRINCIPAL (Logo e Links) --- */
+/* --- CABEÇALHO PRINCIPAL --- */
 .header-principal {
     background-color: var(--branco);
-    border-bottom: 1px solid var(--cinza-borda);
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.05); /* Sombra suave */
+    padding: 15px 0;
 }
 
-.header-principal .container {
+.header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
 }
 
 .logo-escola {
@@ -71,191 +52,220 @@ a {
     align-items: center;
 }
 
-.logo {
-    width: 50px; /* Tamanho do logo */
-    height: auto;
-    margin-right: 15px;
+.logo-icon {
+    font-size: 2em;
+    color: var(--verde-agua);
+    margin-right: 10px;
 }
 
 .nome-projeto {
-    font-size: 1.2em;
-    font-weight: bold;
-    color: var(--preto-texto);
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--azul-escuro);
 }
 
 .links-superiores a {
-    color: var(--preto-texto);
-    margin-left: 15px;
+    margin-left: 20px;
+    font-weight: 600;
+    color: var(--azul-escuro);
 }
 
-/* Linha de destaque (Amarela no Correios, aqui vamos de Cinza/Azul) */
-.linha-destaque {
-    height: 5px;
-    background-color: var(--cinza-fundo);
-    /* Se quiser uma cor mais chamativa: background-color: #ffc107; (Amarelo) */
-    border-top: 1px solid var(--cinza-borda);
+.links-superiores a i {
+    margin-right: 5px;
+    color: var(--verde-agua);
 }
 
 /* --- ÁREA DE TRABALHO (Menu Lateral + Conteúdo) --- */
 .area-trabalho {
     display: flex;
-    padding: 20px 0;
+    padding: 40px 0;
+    gap: 30px;
 }
 
 /* MENU LATERAL */
 .menu-lateral {
     width: 250px;
-    padding-right: 20px;
-    border-right: 1px solid var(--cinza-borda);
+    background-color: var(--cinza-suave);
+    padding: 20px;
+    border-radius: 10px; /* Cantos arredondados */
+    height: fit-content;
 }
 
 .menu-lateral h2 {
-    font-size: 1.2em;
-    color: var(--preto-texto);
+    font-size: 1.3em;
+    color: var(--azul-escuro);
+    border-bottom: 2px solid var(--branco);
+    padding-bottom: 10px;
     margin-top: 0;
-    border-bottom: 2px solid var(--cinza-borda);
-    padding-bottom: 5px;
-    margin-bottom: 10px;
+    margin-bottom: 15px;
+}
+
+.menu-lateral h2 i {
+    color: var(--verde-agua);
+    margin-right: 8px;
 }
 
 .links-sistemas a {
-    display: block;
-    padding: 8px 0;
-    color: var(--preto-texto);
-    border-left: 5px solid transparent;
-    padding-left: 10px;
-    margin-bottom: 3px;
+    display: flex;
+    align-items: center;
+    padding: 12px 10px;
+    color: var(--azul-escuro);
+    border-radius: 5px;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.links-sistemas a i {
+    margin-right: 10px;
+    font-size: 1.1em;
 }
 
 .links-sistemas a.ativo {
-    background-color: var(--azul-principal);
+    background-color: var(--verde-agua);
     color: var(--branco);
-    border-left: 5px solid var(--azul-escuro);
-    font-weight: bold;
+    box-shadow: 0 4px 6px rgba(0, 196, 204, 0.3); /* Sombra para destaque */
 }
 
 .links-sistemas a:not(.ativo):hover {
-    background-color: var(--cinza-fundo);
-    border-left: 5px solid var(--cinza-borda);
+    background-color: var(--branco);
 }
 
 /* CONTEÚDO CENTRAL */
 .conteudo-central {
     flex-grow: 1;
-    padding-left: 30px;
 }
 
-.conteudo-central h1 {
-    font-size: 1.8em;
+/* BANNER HERO (Visual principal) */
+.hero-banner {
+    background-color: var(--cinza-suave);
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.hero-banner h2 {
+    font-size: 2.5em;
     color: var(--azul-escuro);
-    border-bottom: 2px solid var(--cinza-borda);
-    padding-bottom: 5px;
     margin-top: 0;
 }
 
-/* FORMULÁRIO DE BUSCA (A caixa com borda azul) */
-.formulario-busca {
-    border: 1px solid var(--azul-principal); /* Borda Azul */
-    padding: 20px;
-    background-color: var(--branco);
-    margin-top: 20px;
+.hero-banner p {
+    color: var(--cinza-texto);
+    max-width: 700px;
+    margin: 15px auto 30px;
 }
 
-.campo-obrigatorio {
-    background-color: #e9f4ff; /* Azul muito claro */
-    color: var(--preto-texto);
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px dashed var(--azul-principal);
+/* BOTÕES DE AÇÃO */
+.botoes-acao a {
+    padding: 12px 25px;
+    margin: 0 10px;
+    border-radius: 50px; /* Borda curva para visual moderno */
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.botoes-acao a i {
+    margin-right: 8px;
+}
+
+.btn-principal {
+    background-color: var(--verde-agua);
+    color: var(--branco);
+    box-shadow: 0 6px 15px rgba(0, 196, 204, 0.4);
+}
+
+.btn-principal:hover {
+    background-color: var(--verde-agua-escuro);
+    transform: translateY(-2px); /* Efeito de elevação */
+}
+
+.btn-secundario {
+    background-color: var(--branco);
+    color: var(--azul-escuro);
+    border: 2px solid var(--cinza-suave);
+}
+
+.btn-secundario:hover {
+    background-color: var(--cinza-suave);
+    border-color: var(--verde-agua);
+}
+
+/* SEÇÃO DE BUSCA */
+.secao-busca h3 {
+    font-size: 1.6em;
+    color: var(--azul-escuro);
+    border-left: 5px solid var(--verde-agua);
+    padding-left: 15px;
+    margin-bottom: 20px;
+}
+
+.secao-busca h3 i {
+    color: var(--verde-agua);
+    margin-right: 10px;
+}
+
+.formulario-busca {
+    background-color: var(--branco);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(44, 62, 80, 0.08);
 }
 
 /* Estilos de Formulário */
 label {
     display: block;
     margin-top: 15px;
-    font-weight: bold;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--azul-escuro);
 }
 
 input[type="text"], select {
     width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid var(--cinza-borda);
-    box-sizing: border-box; /* Inclui padding e border na largura total */
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 1em;
 }
 
 /* Botões do Formulário */
 .botoes-form {
-    margin-top: 20px;
+    margin-top: 30px;
     text-align: right;
 }
 
-.botoes-form button {
-    padding: 8px 20px;
-    margin-left: 10px;
+.btn-pesquisar {
+    /* Reutiliza o estilo do botão principal */
+    background-color: var(--verde-agua);
+    color: var(--branco);
+    padding: 12px 25px;
     border: none;
     cursor: pointer;
-    font-weight: bold;
-    border-radius: 3px;
-}
-
-.btn-limpar {
-    background-color: var(--cinza-borda);
-    color: var(--preto-texto);
-}
-
-.btn-pesquisar {
-    background-color: var(--azul-principal);
-    color: var(--branco);
+    font-weight: 700;
+    border-radius: 50px;
+    box-shadow: 0 4px 8px rgba(0, 196, 204, 0.3);
+    transition: background-color 0.3s, transform 0.3s;
 }
 
 .btn-pesquisar:hover {
-    background-color: var(--azul-escuro);
+    background-color: var(--verde-agua-escuro);
+    transform: translateY(-2px);
 }
 
-/* Link de Destaque */
-.link-destaque {
-    font-weight: bold;
+.btn-pesquisar i {
+    margin-right: 8px;
 }
 
 /* --- RODAPÉ --- */
 .rodape {
-    background-color: var(--cinza-fundo);
-    border-top: 1px solid var(--cinza-borda);
-    padding-top: 20px;
-    margin-top: 40px;
-}
-
-.rodape .container {
-    display: flex;
-    justify-content: space-between;
-    padding-bottom: 20px;
-}
-
-.rodape .coluna {
-    width: 30%;
-}
-
-.rodape .coluna h3 {
-    font-size: 1.1em;
-    color: var(--azul-escuro);
-    border-bottom: 1px solid var(--cinza-borda);
-    padding-bottom: 5px;
-}
-
-.rodape .coluna ul {
-    list-style: none;
-    padding: 0;
-}
-
-.rodape .coluna li {
-    margin-bottom: 5px;
-}
-
-.rodape-inferior {
+    background-color: var(--cinza-suave);
+    color: var(--cinza-texto);
     text-align: center;
-    padding: 10px 0;
-    background-color: #e0e0e0; /* Cinza um pouco mais escuro */
-    font-size: 0.85em;
-    color: #555;
+    padding: 20px 0;
+    margin-top: 50px;
+    font-size: 0.9em;
 }

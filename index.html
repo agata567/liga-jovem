@@ -4,113 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Achados e Perdidos | Escola 11 de Outubro</title>
-    <link rel="stylesheet" href="style-escola.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style-moderno.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
 
-    <div class="header-topo">
-        <div class="container-topo">
-            <a href="#" class="acessibilidade">Headmouse</a>
-            <a href="#" class="acessibilidade">Teclado Virtual</a>
-            <a href="#" class="acessibilidade">Contraste</a>
-            <a href="#" class="acessibilidade">Tamanho padrão</a>
-            <a href="#conteudo-principal" class="acessibilidade">Ir ao conteúdo</a>
-        </div>
-    </div>
-
     <header class="header-principal">
-        <div class="container">
+        <div class="container header-content">
             <div class="logo-escola">
-                <img src="logo-escola.png" alt="Logo da Escola" class="logo">
+                <i class="fas fa-box-open logo-icon"></i>
                 <span class="nome-projeto">Achados e Perdidos 11 de Outubro</span>
             </div>
             
-            <div class="links-superiores">
-                <a href="contato.html">Fale Conosco</a>
-            </div>
+            <nav class="links-superiores">
+                <a href="contato.html"><i class="fas fa-headset"></i> Contato</a>
+                <a href="sobre.html"><i class="fas fa-users"></i> Sobre Nós</a>
+            </nav>
         </div>
-        <div class="linha-destaque"></div>
     </header>
 
     <div class="area-trabalho container" id="conteudo-principal">
         
         <div class="menu-lateral">
-            <h2>Sistemas</h2>
+            <h2><i class="fas fa-search-location"></i> Navegação</h2>
             <nav class="links-sistemas">
-                <a href="achados.html" class="ativo">Achados e Perdidos</a> 
-                <a href="sobre.html">Sobre o Projeto</a>
-                <a href="perdidos.html">Reportar Perda</a>
+                <a href="index.html" class="ativo"><i class="fas fa-home"></i> Início</a>
+                <a href="achados.html"><i class="fas fa-camera"></i> Ver Achados (Galeria)</a>
+                <a href="perdidos.html"><i class="fas fa-map-marker-alt"></i> Reportar Perda</a>
             </nav>
         </div>
 
         <div class="conteudo-central">
-            <h1>Achados e Perdidos</h1>
             
-            <p><strong>Perdeu seus pertences?</strong> Verifique se o item consta em nossa lista de achados da escola. Todos os itens encontrados são catalogados e ficam guardados no setor de Achados por um período de **60 dias**.</p>
-            <p>Após esse período, os itens não reclamados serão encaminhados para doação.</p>
+            <section class="hero-banner">
+                <h2>Reencontre o que é seu.</h2>
+                <p>Nossa missão é conectar itens perdidos na Escola **11 de Outubro** aos seus donos. Use a busca ou veja nossa galeria.</p>
+                
+                <div class="botoes-acao">
+                    <a href="achados.html" class="btn-principal"><i class="fas fa-images"></i> VER GALERIA DE ACHADOS</a>
+                    <a href="perdidos.html" class="btn-secundario"><i class="fas fa-plus-circle"></i> PERDI ALGO, RELATAR</a>
+                </div>
+            </section>
 
-            <div class="formulario-busca">
-                <p>Para buscar seu item, informe os detalhes abaixo:</p>
-                <form action="buscar.php" method="POST">
-                    
-                    <div class="campo-obrigatorio">
-                        <p>Os campos assinalados com (*) são obrigatórios</p>
-                    </div>
+            <section class="secao-busca">
+                <h3><i class="fas fa-binoculars"></i> Buscar Seu Item</h3>
+                <div class="formulario-busca">
+                    <form action="buscar.php" method="POST">
+                        <label for="tipo_documento">Qual o tipo de item que você perdeu?</label>
+                        <select id="tipo_documento" name="tipo_documento" required>
+                            <option value="">-- Selecione a Categoria --</option>
+                            <option value="chave">Chaves/Chaveiro</option>
+                            <option value="celular">Eletrônicos (Celular, Fone)</option>
+                            </select>
 
-                    <label for="tipo_documento">Informe o tipo do item *</label>
-                    <select id="tipo_documento" name="tipo_documento" required>
-                        <option value="">-- Favor escolher --</option>
-                        <option value="chave">Chave/Chaveiro</option>
-                        <option value="celular">Celular/Dispositivo Eletrônico</option>
-                        <option value="material">Material Escolar (Caderno, Lápis, etc.)</option>
-                        <option value="vestuario">Vestuário (Casaco, Moletom, etc.)</option>
-                        <option value="outros">Outros</option>
-                    </select>
+                        <label for="nome_completo">Descreva brevemente seu item (Ex: Caneta vermelha, Casaco cinza) *</label>
+                        <input type="text" id="nome_completo" name="nome_completo" required placeholder="Ex: Mochila preta com adesivo de gatinho">
 
-                    <label for="nome_completo">Informe a cor ou descrição breve (Ex: Mochila Azul) *</label>
-                    <input type="text" id="nome_completo" name="nome_completo" required>
-
-                    <div class="botoes-form">
-                        <button type="reset" class="btn-limpar">Limpar</button>
-                        <button type="submit" class="btn-pesquisar">Pesquisar</button>
-                    </div>
-
-                </form>
-            </div>
-            
-            <p style="margin-top: 30px;">Não encontrou seu item? <a href="perdidos.html" class="link-destaque">Registre aqui o que você perdeu.</a></p>
+                        <div class="botoes-form">
+                            <button type="submit" class="btn-pesquisar"><i class="fas fa-search"></i> PESQUISAR</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </div>
     </div>
 
     <footer class="rodape">
         <div class="container">
-            <div class="coluna">
-                <h3>Fale Conosco</h3>
-                <p><strong>Manifestação via Internet:</strong> <a href="#">Formulário de Contato</a></p>
-                <p><strong>Atendimento Telefônico:</strong> (XX) XXXX-XXXX</p>
-                <p><strong>Localização:</strong> Secretaria da Escola</p>
-            </div>
-            <div class="coluna">
-                <h3>Portal da Escola</h3>
-                <ul>
-                    <li><a href="#">Calendário</a></li>
-                    <li><a href="#">Notícias</a></li>
-                    <li><a href="#">Fale com a Direção</a></li>
-                    <li><a href="#">Regulamento Interno</a></li>
-                </ul>
-            </div>
-            <div class="coluna">
-                <h3>Achados e Perdidos</h3>
-                <ul>
-                    <li><a href="achados.html">Ver Galeria de Achados</a></li>
-                    <li><a href="perdidos.html">Reportar Item Perdido</a></li>
-                    <li><a href="sobre.html">Sobre Nosso Trabalho</a></li>
-                </ul>
-            </div>
-        </div>
-        <div class="rodape-inferior">
-            &copy; 2025 Achados e Perdidos 11 de Outubro | Projeto da Escola.
+            <p>&copy; 2025 Achados e Perdidos 11 de Outubro | Um projeto da comunidade escolar.</p>
         </div>
     </footer>
 
