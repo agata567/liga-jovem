@@ -1,61 +1,97 @@
-/* Definição da Nova Paleta */
+/* ======================================= */
+/* 1. PALETA DE CORES (VARIÁVEIS) */
+/* ======================================= */
 :root {
-        --azul-escuro: #2C3E50; /* Texto e Títulos */
-        --verde-agua: #00C4CC; /* Destaque e Ação */
-        --verde-agua-escuro: #009999;
-        --cinza-suave: #F0F4F8; /* Fundo de seções/cards */
-        --cinza-texto: #6B7A8C; /* Texto secundário */
-        --branco: #FFFFFF;
-    }
-    /* ... (Seu CSS Original completo vai aqui) ... */
-    /* ... (Incluindo body, .container, a, .header-principal, .header-content, etc.) ... */
-    
-    /* --- AJUSTES ESPECÍFICOS PARA A PÁGINA --- */
-    
-    .descricao-processo {
-        background-color: var(--cinza-suave);
-        border-left: 5px solid var(--verde-agua-escuro);
-        padding: 20px;
-        border-radius: 5px;
-        color: var(--azul-escuro);
-        margin-bottom: 30px;
-    }
-    
-    .descricao-processo a {
-        font-weight: 700;
-    }
-    
-    .aviso-obrigatorio {
-        color: var(--cinza-texto);
-        font-style: italic;
-        font-size: 0.9em;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px dashed var(--cinza-suave);
-    }
-    
-    /* Ajuste do botão de limpeza para usar o estilo secundário */
-    .botoes-form .btn-secundario {
-        /* Reutiliza o estilo do botão secundário, mas o torna um botão nativo */
-        background-color: var(--branco);
-        color: var(--azul-escuro);
-        border: 2px solid var(--cinza-suave);
-        padding: 12px 25px;
-        border-radius: 50px; 
-        font-weight: 700;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    
-    .botoes-form .btn-secundario:hover {
-        background-color: var(--cinza-suave);
-        border-color: var(--azul-escuro);
-        transform: none; /* remove o transform para o botão secundário */
-    }
-    
-    /* Garante que o input e select tenham o mesmo visual */
-    input[type="text"]:focus, select:focus {
-        border-color: var(--verde-agua);
-        outline: none;
-        box-shadow: 0 0 5px rgba(0, 196, 204, 0.5);
-    }
+    --azul-escuro: #2C3E50; /* Texto e Títulos */
+    --verde-agua: #00C4CC; /* Destaque e Ação */
+    --verde-agua-escuro: #009999;
+    --cinza-suave: #F0F4F8; /* Fundo de seções/cards */
+    --cinza-texto: #6B7A8C; /* Texto secundário */
+    --branco: #FFFFFF;
+}
+
+/* ======================================= */
+/* 2. ESTILOS BASE */
+/* ======================================= */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--branco);
+    color: var(--azul-escuro);
+    font-size: 16px;
+    line-height: 1.6;
+}
+
+.container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+a {
+    text-decoration: none;
+    color: var(--verde-agua);
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: var(--verde-agua-escuro);
+}
+
+/* ======================================= */
+/* 3. CABEÇALHO */
+/* ======================================= */
+.header-principal {
+    background-color: var(--branco);
+    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.05); /* Sombra suave */
+    padding: 15px 0;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-escola {
+    display: flex;
+    align-items: center;
+}
+
+.logo-icon {
+    font-size: 2em;
+    color: var(--verde-agua);
+    margin-right: 10px;
+}
+
+.nome-projeto {
+    font-size: 1.5em;
+    font-weight: 700;
+    color: var(--azul-escuro);
+}
+
+.links-superiores a {
+    margin-left: 20px;
+    font-weight: 600;
+    color: var(--azul-escuro);
+}
+
+.links-superiores a i {
+    margin-right: 5px;
+    color: var(--verde-agua);
+}
+
+/* ======================================= */
+/* 4. ÁREA DE TRABALHO E MENU LATERAL */
+/* ======================================= */
+.area-trabalho {
+    display: flex;
+    padding: 40px 0;
+    gap: 30px;
+}
+
+/* MENU LATERAL */
+.menu-lateral {
+    width: 250px;
+    background-color: var(--cinza-suave);

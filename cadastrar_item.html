@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastrar Item Encontrado - Sistema Escolar</title>
+    
+    <link rel="stylesheet" href="styles.css"> 
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <header class="header-principal">
+        <div class="container header-content">
+            <div class="logo-escola">
+                <i class="fas fa-graduation-cap logo-icon"></i>
+                <span class="nome-projeto">SECRETARIA VIRTUAL</span>
+            </div>
+            <nav class="links-superiores">
+                <a href="#"><i class="fas fa-user-circle"></i> Meu Perfil</a>
+                <a href="#"><i class="fas fa-bell"></i> Avisos</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="area-trabalho container">
+
+        <aside class="menu-lateral">
+            <h2><i class="fas fa-list-ul"></i> Serviços</h2>
+            <nav class="links-sistemas">
+                <a href="achados_escola.html">
+                    <i class="fas fa-box-open"></i> Achados e Perdidos
+                </a>
+                <a href="#">
+                    <i class="fas fa-calendar-alt"></i> Calendário Escolar
+                </a>
+                <a href="#">
+                    <i class="fas fa-book"></i> Solicitar Materiais
+                </a>
+                <a href="#">
+                    <i class="fas fa-headset"></i> Fale com a Coordenação
+                </a>
+            </nav>
+        </aside>
+
+        <main class="conteudo-central">
+            
+            <section class="hero-banner">
+                <h2>Registrar Novo Item Encontrado</h2>
+                <p>Obrigado por sua honestidade! Use o formulário abaixo para registrar o item que você encontrou antes de entregá-lo na Secretaria.</p>
+            </section>
+            
+            <section class="secao-busca">
+                <h3><i class="fas fa-clipboard-list"></i> Detalhes do Item</h3>
+                
+                <div class="formulario-busca">
+                    
+                    <p class="aviso-obrigatorio">Os campos assinalados com (*) são obrigatórios</p>
+
+                    <form action="#" method="post">
+                        
+                        <div style="display: flex; gap: 30px;">
+                            <div style="flex: 1;">
+                                <label for="tipo-item">Categoria do Item *</label>
+                                <select id="tipo-item" name="tipo-item" required>
+                                    <option value="">-- Escolha a Categoria --</option>
+                                    <option value="eletronico">Eletrônico (Celular/Fone)</option>
+                                    <option value="material">Material Escolar (Livro/Caderno)</option>
+                                    <option value="roupa">Vestuário (Uniforme/Agasalho)</option>
+                                    <option value="documento">Documento/Carteira</option>
+                                    <option value="outros">Outros</option>
+                                </select>
+
+                                <label for="local-encontrado">Local Onde Foi Encontrado *</label>
+                                <input type="text" id="local-encontrado" name="local-encontrado" required placeholder="Ex: Pátio Principal, Sala 205, Quadra">
+                                
+                                <label for="data-encontrado">Data em que Foi Encontrado *</label>
+                                <input type="date" id="data-encontrado" name="data-encontrado" required>
+                            </div>
+
+                            <div style="flex: 1;">
+                                <label for="descricao-detalhada">Descrição Detalhada *</label>
+                                <textarea id="descricao-detalhada" name="descricao-detalhada" rows="4" required placeholder="Cor, marca, detalhes específicos (ex: 'Moletom cinza da marca X com um nome bordado Y')."></textarea>
+                                
+                                <label for="encontrado-por">Seu Nome (Opcional, para agradecimento)</label>
+                                <input type="text" id="encontrado-por" name="encontrado-por" placeholder="Nome Completo">
+                            </div>
+                        </div>
+
+                        <div class="botoes-form">
+                            <button type="reset" class="btn-secundario" style="margin-right: 10px;">Limpar Formulário</button>
+                            <button type="submit" class="btn-principal btn-pesquisar"><i class="fas fa-save"></i> Registrar Item</button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <footer class="rodape">
+        <div class="container">
+            © 2025 Escola Modelo. Todos os direitos reservados.
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -3,21 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Achados e Perdidos - Correios Moderno</title>
-    <link rel="stylesheet" href="style.css"> 
+    <title>Achados e Perdidos - Sistema Escolar</title>
+    
+    <link rel="stylesheet" href="styles.css"> 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
     <header class="header-principal">
         <div class="container header-content">
             <div class="logo-escola">
-                <i class="fas fa-truck-fast logo-icon"></i>
-                <span class="nome-projeto">CORREIOS</span>
+                <i class="fas fa-graduation-cap logo-icon"></i>
+                <span class="nome-projeto">SECRETARIA VIRTUAL</span>
             </div>
             <nav class="links-superiores">
-                <a href="#"><i class="fas fa-search"></i> Outros sites</a>
-                <a href="#"><i class="fas fa-envelope"></i> Fale com os Correios</a>
+                <a href="#"><i class="fas fa-user-circle"></i> Meu Perfil</a>
+                <a href="#"><i class="fas fa-bell"></i> Avisos</a>
             </nav>
         </div>
     </header>
@@ -25,19 +27,19 @@
     <div class="area-trabalho container">
 
         <aside class="menu-lateral">
-            <h2><i class="fas fa-th-large"></i> Sistemas</h2>
+            <h2><i class="fas fa-list-ul"></i> Serviços</h2>
             <nav class="links-sistemas">
-                <a href="#" class="ativo">
+                <a href="achados_escola.html" class="ativo">
                     <i class="fas fa-box-open"></i> Achados e Perdidos
                 </a>
                 <a href="#">
-                    <i class="fas fa-shipping-fast"></i> Rastreamento
+                    <i class="fas fa-calendar-alt"></i> Calendário Escolar
                 </a>
                 <a href="#">
-                    <i class="fas fa-calculator"></i> Cáculo de Preços e Prazos
+                    <i class="fas fa-book"></i> Solicitar Materiais
                 </a>
                 <a href="#">
-                    <i class="fas fa-question-circle"></i> Ajuda e Suporte
+                    <i class="fas fa-headset"></i> Fale com a Coordenação
                 </a>
             </nav>
         </aside>
@@ -45,22 +47,19 @@
         <main class="conteudo-central">
             
             <section class="hero-banner">
-                <h2>Achados e Perdidos</h2>
-                <p>Verifique se seus documentos ou objetos perdidos estão sob nossa custódia. Encontrou algo? Faça a manifestação no link abaixo.</p>
+                <h2>Achados e Perdidos da Escola</h2>
+                <p>Procurando um livro, uniforme ou celular? Use a busca abaixo para verificar se seu item está na secretaria.</p>
                 <div class="botoes-acao">
-                    <a href="#" class="btn-principal"><i class="fas fa-search-dollar"></i> Verificar Achados</a>
-                    <a href="#" class="btn-secundario"><i class="fas fa-headset"></i> Fale com os Correios</a>
+                    <a href="cadastrar_item.html" class="btn-principal"><i class="fas fa-plus-circle"></i> Cadastrar Item Encontrado</a>
+                    <a href="#" class="btn-secundario"><i class="fas fa-map-marker-alt"></i> Onde Retirar?</a>
                 </div>
             </section>
             
             <section class="secao-busca">
-                <h3><i class="fas fa-file-alt"></i> Buscar Documento Perdido</h3>
+                <h3><i class="fas fa-search"></i> Buscar Item Perdido</h3>
                 
                 <p class="descricao-processo">
-                    Perdeu seus documentos? Verifique primeiramente se seu nome consta na relação de achados e perdidos dos Correios.
-                    Se constar, favor contatar a agência onde estão seus documentos. Os documentos são mantidos na agência por **60 dias** contados a partir da data em que deram entrada. Após esse período, são encaminhados aos órgãos emissores.
-                    <br>No momento da retirada, você deve comprovar que é o titular do documento e pagar a taxa (
-                    <a href="#">verifique o valor da taxa</a>).
+                    Verifique se o seu nome ou o item está na lista. Os itens são guardados na **Secretaria** por 30 dias. Itens de valor (como celulares) só serão devolvidos ao responsável ou aluno mediante identificação.
                 </p>
                 
                 <div class="formulario-busca">
@@ -69,18 +68,18 @@
 
                     <form action="#" method="post">
                         
-                        <label for="tipo-documento">Informe o tipo de documento *</label>
-                        <select id="tipo-documento" name="tipo-documento" required>
+                        <label for="tipo-item">Tipo de Item Perdido *</label>
+                        <select id="tipo-item" name="tipo-item" required>
                             <option value="">-- Favor escolher --</option>
-                            <option value="rg">RG (Registro Geral)</option>
-                            <option value="cnh">CNH (Carteira de Motorista)</option>
-                            <option value="cpf">CPF</option>
-                            <option value="titulo">Título de Eleitor</option>
-                            <option value="outros">Outros Documentos/Objetos</option>
+                            <option value="uniforme">Uniforme / Agasalho</option>
+                            <option value="livro">Livro / Caderno</option>
+                            <option value="eletronico">Celular / Fone de Ouvido</option>
+                            <option value="carteira">Carteira / Documento</option>
+                            <option value="outros">Outros Objetos</option>
                         </select>
 
-                        <label for="nome-completo">Informe o nome completo *</label>
-                        <input type="text" id="nome-completo" name="nome-completo" required placeholder="Digite seu nome completo...">
+                        <label for="descricao">Palavra-chave ou Nome na Etiqueta *</label>
+                        <input type="text" id="descricao" name="descricao" required placeholder="Ex: 'Agenda da Maria', 'Mochila azul', 'Nome João'">
 
                         <div class="botoes-form">
                             <button type="reset" class="btn-secundario" style="margin-right: 10px;">Limpar</button>
@@ -95,7 +94,7 @@
 
     <footer class="rodape">
         <div class="container">
-            © 2025 Correios. Todos os direitos reservados.
+            © 2025 Escola Modelo. Todos os direitos reservados.
         </div>
     </footer>
 
