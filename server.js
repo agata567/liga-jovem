@@ -24,6 +24,9 @@ db.serialize(() => {
     )`);
 });
 
+
+
+
 // Rota para listar itens
 app.get('/api/itens', (req, res) => {
     db.all("SELECT * FROM itens ORDER BY id DESC", [], (err, rows) => {
