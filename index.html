@@ -1,102 +1,55 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Achados e Perdidos - Sistema Escolar</title>
-    
-    <link rel="stylesheet" href="styles.css"> 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mural - Achados e Perdidos</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <header class="header-principal">
-        <div class="container header-content">
-            <div class="logo-escola">
-                <i class="fas fa-graduation-cap logo-icon"></i>
-                <span class="nome-projeto">SECRETARIA VIRTUAL</span>
-            </div>
-            <nav class="links-superiores">
-                <a href="#"><i class="fas fa-user-circle"></i> Meu Perfil</a>
-                <a href="#"><i class="fas fa-bell"></i> Avisos</a>
-            </nav>
-        </div>
-    </header>
-
-    <div class="area-trabalho container">
-
-        <aside class="menu-lateral">
-            <h2><i class="fas fa-list-ul"></i> Serviços</h2>
-            <nav class="links-sistemas">
-                <a href="achados_escola.html" class="ativo">
-                    <i class="fas fa-box-open"></i> Achados e Perdidos
-                </a>
-                <a href="#">
-                    <i class="fas fa-calendar-alt"></i> Calendário Escolar
-                </a>
-                <a href="#">
-                    <i class="fas fa-book"></i> Solicitar Materiais
-                </a>
-                <a href="#">
-                    <i class="fas fa-headset"></i> Fale com a Coordenação
-                </a>
-            </nav>
-        </aside>
-
-        <main class="conteudo-central">
-            
-            <section class="hero-banner">
-                <h2>Achados e Perdidos da Escola</h2>
-                <p>Procurando um livro, uniforme ou celular? Use a busca abaixo para verificar se seu item está na secretaria.</p>
-                <div class="botoes-acao">
-                    <a href="cadastrar_item.html" class="btn-principal"><i class="fas fa-plus-circle"></i> Cadastrar Item Encontrado</a>
-                    <a href="#" class="btn-secundario"><i class="fas fa-map-marker-alt"></i> Onde Retirar?</a>
-                </div>
-            </section>
-            
-            <section class="secao-busca">
-                <h3><i class="fas fa-search"></i> Buscar Item Perdido</h3>
-                
-                <p class="descricao-processo">
-                    Verifique se o seu nome ou o item está na lista. Os itens são guardados na **Secretaria** por 30 dias. Itens de valor (como celulares) só serão devolvidos ao responsável ou aluno mediante identificação.
-                </p>
-                
-                <div class="formulario-busca">
-                    
-                    <p class="aviso-obrigatorio">Os campos assinalados com (*) são obrigatórios</p>
-
-                    <form action="#" method="post">
-                        
-                        <label for="tipo-item">Tipo de Item Perdido *</label>
-                        <select id="tipo-item" name="tipo-item" required>
-                            <option value="">-- Favor escolher --</option>
-                            <option value="uniforme">Uniforme / Agasalho</option>
-                            <option value="livro">Livro / Caderno</option>
-                            <option value="eletronico">Celular / Fone de Ouvido</option>
-                            <option value="carteira">Carteira / Documento</option>
-                            <option value="outros">Outros Objetos</option>
-                        </select>
-
-                        <label for="descricao">Palavra-chave ou Nome na Etiqueta *</label>
-                        <input type="text" id="descricao" name="descricao" required placeholder="Ex: 'Agenda da Maria', 'Mochila azul', 'Nome João'">
-
-                        <div class="botoes-form">
-                            <button type="reset" class="btn-secundario" style="margin-right: 10px;">Limpar</button>
-                            <button type="submit" class="btn-pesquisar"><i class="fas fa-search"></i> Pesquisar</button>
-                        </div>
-                    </form>
-                </div>
-            </section>
-
-        </main>
+  <header>
+    <h1>Mural de Itens Encontrados</h1>
+    <div class="nav-buttons">
+      <a href="cadastrar_item.html" class="btn">+ Registo de Item</a>
     </div>
+  </header>
 
-    <footer class="rodape">
-        <div class="container">
-            © 2025 Escola Modelo. Todos os direitos reservados.
-        </div>
-    </footer>
+  <main id="listaItens">
+    <p style="text-align: center; color: var(--text-muted);">A carregar itens...</p>
+  </main>
 
+  <script>
+    async function carregarItens() {
+      const container = document.getElementById('listaItens');
+      try {
+        const response = await fetch('http://localhost:3000/api/itens');
+        const itens = await response.json();
+
+        container.innerHTML = '';
+
+        if (itens.length === 0) {
+          container.innerHTML = '<p style="text-align: center;">Nenhum item registado até ao momento.</p>';
+          return;
+        }
+
+        itens.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'item-card';
+          card.innerHTML = `
+            <span class="badge">${item.categoria}</span>
+            <h3>${item.titulo}</h3>
+            <p><strong>Local:</strong> ${item.local_encontrado}</p>
+            <p>${item.descricao || 'Sem descrição adicional.'}</p>
+          `;
+          container.appendChild(card);
+        });
+      } catch (err) {
+        console.error('Erro ao procurar itens:', err);
+        container.innerHTML = '<p style="text-align: center; color: red;">Não foi possível carregar os itens do servidor.</p>';
+      }
+    }
+
+    carregarItens();
+  </script>
 </body>
 </html>

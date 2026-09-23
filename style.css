@@ -1,97 +1,141 @@
-/* ======================================= */
-/* 1. PALETA DE CORES (VARIÁVEIS) */
-/* ======================================= */
 :root {
-    --azul-escuro: #2C3E50; /* Texto e Títulos */
-    --verde-agua: #00C4CC; /* Destaque e Ação */
-    --verde-agua-escuro: #009999;
-    --cinza-suave: #F0F4F8; /* Fundo de seções/cards */
-    --cinza-texto: #6B7A8C; /* Texto secundário */
-    --branco: #FFFFFF;
+  --primary-color: #4f46e5;
+  --primary-hover: #4338ca;
+  --background-color: #f3f4f6;
+  --card-background: #ffffff;
+  --text-color: #1f2937;
+  --text-muted: #6b7280;
+  --border-radius: 12px;
 }
 
-/* ======================================= */
-/* 2. ESTILOS BASE */
-/* ======================================= */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
 body {
-    font-family: 'Poppins', sans-serif;
-    margin: 0;
-    padding: 0;
-    background-color: var(--branco);
-    color: var(--azul-escuro);
-    font-size: 16px;
-    line-height: 1.6;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
 
-.container {
-    width: 90%;
-    max-width: 1200px;
-    margin: 0 auto;
+header {
+  width: 100%;
+  max-width: 600px;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
-a {
-    text-decoration: none;
-    color: var(--verde-agua);
-    transition: color 0.3s;
+header h1 {
+  color: var(--primary-color);
+  font-size: 1.8rem;
+  margin-bottom: 8px;
 }
 
-a:hover {
-    color: var(--verde-agua-escuro);
+.nav-buttons {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 12px;
 }
 
-/* ======================================= */
-/* 3. CABEÇALHO */
-/* ======================================= */
-.header-principal {
-    background-color: var(--branco);
-    box-shadow: 0 2px 10px rgba(44, 62, 80, 0.05); /* Sombra suave */
-    padding: 15px 0;
+.btn {
+  background-color: var(--primary-color);
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: var(--border-radius);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.btn:hover {
+  background-color: var(--primary-hover);
 }
 
-.logo-escola {
-    display: flex;
-    align-items: center;
+.btn-secondary {
+  background-color: #e5e7eb;
+  color: var(--text-color);
 }
 
-.logo-icon {
-    font-size: 2em;
-    color: var(--verde-agua);
-    margin-right: 10px;
+.btn-secondary:hover {
+  background-color: #d1d5db;
 }
 
-.nome-projeto {
-    font-size: 1.5em;
-    font-weight: 700;
-    color: var(--azul-escuro);
+main {
+  width: 100%;
+  max-width: 600px;
 }
 
-.links-superiores a {
-    margin-left: 20px;
-    font-weight: 600;
-    color: var(--azul-escuro);
+/* Formit estilo mobile */
+form {
+  background: var(--card-background);
+  padding: 24px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.links-superiores a i {
-    margin-right: 5px;
-    color: var(--verde-agua);
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-/* ======================================= */
-/* 4. ÁREA DE TRABALHO E MENU LATERAL */
-/* ======================================= */
-.area-trabalho {
-    display: flex;
-    padding: 40px 0;
-    gap: 30px;
+.form-group label {
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
-/* MENU LATERAL */
-.menu-lateral {
-    width: 250px;
-    background-color: var(--cinza-suave);
+.form-group input,
+.form-group select,
+.form-group textarea {
+  padding: 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color);
+}
+
+/* Lista de Itens (Feed) */
+.item-card {
+  background: var(--card-background);
+  padding: 16px;
+  border-radius: var(--border-radius);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.item-card h3 {
+  font-size: 1.1rem;
+  color: var(--text-color);
+}
+
+.item-card .badge {
+  align-self: flex-start;
+  background-color: #e0e7ff;
+  color: var(--primary-color);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
