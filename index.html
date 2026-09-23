@@ -1,51 +1,69 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mural - Achados e Perdidos</title>
+  <title>Achados e Perdidos - Escola</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
   <header>
-    <h1>Mural de Itens Encontrados</h1>
+    <h1>🔍 Achados e Perdidos</h1>
     <div class="nav-buttons">
-      <a href="cadastrar_item.html" class="btn">+ Registo de Item</a>
+      <a href="cadastrar_item.html" class="btn">+ Novo Item</a>
     </div>
   </header>
 
-  <main id="listaItens">
-    <p style="text-align: center; color: var(--text-muted);">A carregar itens...</p>
+  <main>
+    <div id="listaItens">
+      <!-- Os itens vão aparecer aqui via JS -->
+    </div>
   </main>
 
   <script>
     async function carregarItens() {
       const container = document.getElementById('listaItens');
+      
       try {
-        const response = await fetch('http://localhost:3000/api/itens');
-        const itens = await response.json();
-
-        container.innerHTML = '';
+        const res = await fetch('http://localhost:3000/api/itens');
+        const itens = await res.json();
 
         if (itens.length === 0) {
-          container.innerHTML = '<p style="text-align: center;">Nenhum item registado até ao momento.</p>';
+          container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum item registado no momento.</p>';
           return;
         }
 
-        itens.forEach(item => {
-          const card = document.createElement('div');
-          card.className = 'item-card';
-          card.innerHTML = `
-            <span class="badge">${item.categoria}</span>
+        container.innerHTML = itens.map(item => `
+          <div class="item-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <span class="badge">${item.categoria}</span>
+              <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
+            </div>
             <h3>${item.titulo}</h3>
-            <p><strong>Local:</strong> ${item.local_encontrado}</p>
             <p>${item.descricao || 'Sem descrição adicional.'}</p>
-          `;
-          container.appendChild(card);
-        });
+            <p><strong>📍 Local:</strong> ${item.local_encontrado}</p>
+          </div>
+        `).join('');
+
       } catch (err) {
-        console.error('Erro ao procurar itens:', err);
-        container.innerHTML = '<p style="text-align: center; color: red;">Não foi possível carregar os itens do servidor.</p>';
+        console.error('Erro ao carregar itens:', err);
+        container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar lista de itens.</p>';
+      }
+    }
+
+    async function eliminarItem(id) {
+      if (!confirm('Tem a certeza que deseja eliminar este item?')) return;
+
+      try {
+        const res = await fetch(`http://localhost:3000/api/itens/${id}`, { method: 'DELETE' });
+        if (res.ok) {
+          carregarItens(); // Atualiza a lista automaticamente
+        } else {
+          alert('Erro ao eliminar item.');
+        }
+      } catch (err) {
+        alert('Servidor indisponível.');
       }
     }
 
