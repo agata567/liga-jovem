@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Itens Perdidos - Liga Jovem</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+        .card { background: white; padding: 15px; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .status-disponivel { color: #d9534f; font-weight: bold; }
+        .status-resgatado { color: #5cb85c; font-weight: bold; }
+        .edit-form { margin-top: 10px; padding-top: 10px; border-top: 1px solid #ddd; }
+        input, select, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
+        button:hover { background-color: #45a049; }
+    </style>
+</head>
+<body>
+
+    <h1>Lista de Itens Achados</h1>
+    <div id="lista-itens">A carregar itens...</div>
+
+    <script>
+        const API_URL = 'http://localhost:3000/api/itens';
+
+        // Carregar os itens ao abrir a página
+        async function carregarItens() {
+            try {
+                const res = await fetch(API_URL);
+                const itens = await res.json();
+                
+                const container = document.getElementById('lista-itens');
+                container.innerHTML = '';
+
+                if (itens.length === 0) {
+                    container.innerHTML = '<p>Nenhum item registado no momento.</p>';
+                    return;
+                }
+
+                itens.forEach(item => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    
+                    const isResgatado = item.status === 'resgatado';
+                    const statusTexto = isResgatado ? 'Dono Encontrado' : 'Aguardando Dono';
+                    const statusClasse = isResgatado ? 'status-resgatado' : 'status-disponivel';
+
+                    card.innerHTML = `
+                        <h3>${item.nome} <small>(${item.categoria})</small></h3>
+                        <p><strong>Encontrado em:</strong> ${item.local_encontrado}</p>
+                        <p><strong>Descrição:</strong> ${item.descricao || 'Sem descrição'}</p>
+                        <p><strong>Estado:</strong> <span class="${statusClasse}">${statusTexto}</span></p>
+                        ${item.local_recolha ? `<p><strong>Onde recolher:</strong> ${item.local_recolha}</p>` : ''}
+
+                        <div class="edit-form">
+                            <h4>Atualizar Estado do Item</h4>
+                            <form onsubmit="atualizarItem(event, ${item.id})">
+                                <label>Estado:</label>
+                                <select id="status-${item.id}">
+                                    <option value="disponivel" ${item.status === 'disponivel' ? 'selected' : ''}>Aguardando Dono</option>
+                                    <option value="resgatado" ${item.status === 'resgatado' ? 'selected' : ''}>Dono Encontrado</option>
+                                </select>
+
+                                <label>Onde pode ser recolhido?</label>
+                                <input type="text" id="recolha-${item.id}" placeholder="Ex: Portaria Principal, Secretaria" value="${item.local_recolha || ''}" required>
+
+                                <button type="submit">Guardar Alteração</button>
+                            </form>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar itens:', error);
+                document.getElementById('lista-itens').innerText = 'Erro ao carregar os itens.';
+            }
+        }
+
+        // Função para atualizar o item via API (PUT)
+        async function atualizarItem(event, id) {
+            event.preventDefault();
+
+            const status = document.getElementById(`status-${id}`).value;
+            const local_recolha = document.getElementById(`recolha-${id}`).value;
+
+            try {
+                const response = await fetch(`${API_URL}/${id}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ status, local_recolha })
+                });
+
+                if (response.ok) {
+                    alert('Informações atualizadas com sucesso!');
+                    carregarItens(); // Recarrega a lista
+                } else {
+                    alert('Erro ao atualizar o item.');
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                alert('Erro de conexão com o servidor.');
+            }
+        }
+
+        // Inicializar a busca
+        carregarItens();
+    </script>
+</body>
+</html>
