@@ -1,51 +1,76 @@
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
+const mysql = require('mysql2');
 const cors = require('cors');
 
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// Conexão com o banco de dados
-const db = new sqlite3.Database('./banco_escola.db', (err) => {
-    if (err) console.error("Erro ao conectar no BD:", err.message);
-    else console.log("Conectado ao banco de dados SQLite.");
+// Configuração da conexão com o MySQL
+const db = mysql.createPool({
+    host: 'localhost',      // Endereço do servidor MySQL
+    user: 'root',           // O teu utilizador do MySQL
+    password: '',           // A tua palavra-passe do MySQL
+    database: 'banco_escola',
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-// Criar tabela automaticamente se não existir
-db.serialize(() => {
-    db.run(`CREATE TABLE IF NOT EXISTS itens (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        titulo TEXT NOT NULL,
-        descricao TEXT,
-        categoria TEXT NOT NULL,
-        local_encontrado TEXT NOT NULL,
-        status TEXT DEFAULT 'perdido'
-    )`);
+// Testar conexão
+db.getConnection((err, connection) => {
+    if (err) {
+        console.error('Erro ao conectar ao MySQL:', err.message);
+    } else {
+        console.log('Conectado com sucesso ao MySQL!');
+        connection.release();
+    }
 });
 
-
-
-
-// Rota para listar itens
-app.get('/api/itens', (req, res) => {
-    db.all("SELECT * FROM itens ORDER BY id DESC", [], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// Rota para cadastrar item
+// Rota 1: Cadastrar novo item
 app.post('/api/itens', (req, res) => {
-    const { titulo, descricao, categoria, local_encontrado } = req.body;
-    const sql = `INSERT INTO itens (titulo, descricao, categoria, local_encontrado) VALUES (?, ?, ?, ?)`;
-    
-    db.run(sql, [titulo, descricao, categoria, local_encontrado], function(err) {
-        if (err) return res.status(400).json({ error: err.message });
-        res.status(201).json({ id: this.lastID, mensagem: "Item cadastrado com sucesso!" });
+    const { nome, categoria, local_encontrado, descricao } = req.body;
+    const query = `INSERT INTO itens (nome, categoria, local_encontrado, descricao) VALUES (?, ?, ?, ?)`;
+
+    db.query(query, [nome, categoria, local_encontrado, descricao], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.status(201).json({ message: 'Item registado com sucesso!', id: result.insertId });
     });
 });
 
-app.listen(3000, () => {
-    console.log("Servidor Back-End rodando em http://localhost:3000");
+// Rota 2: Listar todos os itens
+app.get('/api/itens', (req, res) => {
+    const query = `SELECT * FROM itens ORDER BY criado_em DESC`;
+
+    db.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(results);
+    });
+});
+
+// Rota 3: Atualizar estado do item (Dono encontrou / Local de recolha)
+app.put('/api/itens/:id', (req, res) => {
+    const { id } = req.params;
+    const { status, local_recolha } = req.body;
+
+    const query = `UPDATE itens SET status = ?, local_recolha = ? WHERE id = ?`;
+
+    db.query(query, [status, local_recolha, id], (err, result) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (result.affectedRows === 0) {
+            return res.status(404).json({ message: 'Item não encontrado.' });
+        }
+        res.json({ message: 'Item atualizado com sucesso!' });
+    });
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor a correr na porta ${PORT}`);
 });
