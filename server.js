@@ -7,12 +7,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Servir ficheiros estáticos da pasta do projeto
+// SERVIR FICHEIROS ESTÁTICOS (HTML, CSS, JS)
 app.use(express.static(__dirname));
 
-// Rota principal (ao aceder http://localhost:3000)
+// ROTA PRINCIPAL: Abre o itens.html automaticamente quando acedes a http://localhost:3000
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'itens.html')); // Redireciona para o teu itens.html
+    res.sendFile(path.join(__dirname, 'itens.html'));
 });
 
 // Configuração da conexão com o MySQL
@@ -20,7 +20,7 @@ const db = mysql.createPool({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'root', // A tua palavra-passe
+    password: 'root', // Insere a tua palavra-passe se tiveres uma configurada
     database: 'banco_escola',
     waitForConnections: true,
     connectionLimit: 10,
@@ -36,7 +36,7 @@ db.getConnection((err, connection) => {
     }
 });
 
-// Rotas da API
+// ROTAS DA API
 app.get('/api/itens', (req, res) => {
     const query = `SELECT * FROM itens ORDER BY criado_em DESC`;
     db.query(query, (err, results) => {
@@ -70,5 +70,5 @@ app.put('/api/itens/:id', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor a correr em http://localhost:${PORT}`);
+    console.log(`Servidor a correr na porta ${PORT}`);
 });
