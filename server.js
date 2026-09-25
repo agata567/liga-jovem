@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
         res.status(404).send(`
             <div style="font-family: Arial, sans-serif; padding: 30px; line-height: 1.6;">
                 <h2 style="color: #d9534f;">❌ Erro: Nenhum ficheiro HTML principal foi encontrado!</h2>
-                <p>O Express tentou procurar nas seguintes localizações:</p>
+                <p>O Express tentou procurar nas seguintes localizaciones:</p>
                 <ul>
                     <li><code>${caminhoIndex}</code> (Não encontrado)</li>
                     <li><code>${caminhoItens}</code> (Não encontrado)</li>
@@ -86,12 +86,29 @@ const db = mysql.createPool({
     queueLimit: 0
 });
 
+// Conecta ao banco e cria a coluna de imagem automaticamente caso ela não exista
 db.getConnection((err, connection) => {
     if (err) {
         console.error('Erro ao conectar ao MySQL:', err.message);
     } else {
         console.log('Conectado com sucesso ao MySQL!');
-        connection.release();
+        
+        // Verifica se a coluna imagem_url já existe na tabela itens
+        connection.query("SHOW COLUMNS FROM itens LIKE 'imagem_url'", (errColuna, results) => {
+            if (!errColuna && results.length === 0) {
+                // Se não existir, adiciona dinamicamente sem quebrar os dados existentes
+                connection.query("ALTER TABLE itens ADD COLUMN imagem_url VARCHAR(255) DEFAULT NULL", (errAlter) => {
+                    if (errAlter) {
+                        console.error('Erro ao criar a coluna imagem_url automaticamente:', errAlter.message);
+                    } else {
+                        console.log('Coluna [imagem_url] verificada e criada com sucesso no MySQL!');
+                    }
+                });
+            } else if (!errColuna) {
+                console.log('A coluna [imagem_url] já existe e está pronta para uso.');
+            }
+            connection.release(); // Libera a conexão de volta para o pool de forma segura
+        });
     }
 });
 
@@ -131,7 +148,7 @@ app.put('/api/itens/:id', (req, res) => {
     db.query(query, [status, local_recolha, id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Item não encontrado.' });
-        res.json({ message: 'Item updated com sucesso!' });
+        res.json({ message: 'Item atualizado com sucesso!' });
     });
 });
 
