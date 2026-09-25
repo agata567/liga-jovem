@@ -11,7 +11,7 @@ const db = mysql.createPool({
     host: 'localhost',      // Endereço do servidor MySQL
     port: 3306,             // Porta padrão do MySQL Workbench
     user: 'root',           // O teu utilizador do MySQL
-    password: '', // <--- MUDAR AQUI: Coloca a tua palavra-passe do MySQL Workbench
+    password: 'SIM', // <--- MUDAR AQUI: Coloca a tua palavra-passe do MySQL Workbench
     database: 'banco_escola',
     waitForConnections: true,
     connectionLimit: 10,
