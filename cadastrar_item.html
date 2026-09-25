@@ -15,11 +15,12 @@
   </header>
 
   <main>
-    <form id="formCadastro">
+    <form id="formCadastro" enctype="multipart/form-data"> <!-- Adicionado suporte a ficheiros no form -->
       <h2>Cadastrar Novo Item</h2>
       
       <div class="form-group">
         <label for="titulo">Nome do Objeto</label>
+        <!-- Mantido o id="titulo" no HTML para não quebrar estilos, mas mapeado como "nome" no JS -->
         <input type="text" id="titulo" placeholder="Ex: Casaco azul, Chaveiro..." required>
       </div>
 
@@ -44,6 +45,12 @@
         <textarea id="descricao" rows="3" placeholder="Insira detalhes como cor, marca ou marcas de uso..."></textarea>
       </div>
 
+      <!-- Novo campo para carregar a foto do item -->
+      <div class="form-group">
+        <label for="imagem">Foto do Item (Opcional)</label>
+        <input type="file" id="imagem" accept="image/*">
+      </div>
+
       <button type="submit" class="btn">Registar Item</button>
     </form>
   </main>
@@ -52,25 +59,34 @@
     document.getElementById('formCadastro').addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const itemData = {
-        titulo: document.getElementById('titulo').value,
-        categoria: document.getElementById('categoria').value,
-        local_encontrado: document.getElementById('local').value,
-        descricao: document.getElementById('descricao').value
-      };
+      // Instancia o FormData para agrupar textos e ficheiros binários
+      const formData = new FormData();
+      
+      // Mapeia os dados nos campos esperados pelo seu Back-End (nome, categoria, local_encontrado, descricao)
+      formData.append('nome', document.getElementById('titulo').value);
+      formData.append('categoria', document.getElementById('categoria').value);
+      formData.append('local_encontrado', document.getElementById('local').value);
+      formData.append('descricao', document.getElementById('descricao').value);
+
+      // Verifica se o utilizador selecionou alguma imagem antes de anexar
+      const inputImagem = document.getElementById('imagem');
+      if (inputImagem.files.length > 0) {
+        formData.append('imagem', inputImagem.files[0]); // O nome 'imagem' deve ser igual ao do upload.single('imagem') no backend
+      }
 
       try {
         const response = await fetch('http://localhost:3000/api/itens', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(itemData)
+          // ATENÇÃO: Não adicione 'Content-Type' nos headers. O browser define o boundary automaticamente ao enviar um FormData.
+          body: formData 
         });
 
         if (response.ok) {
           alert('Item registado com sucesso!');
           window.location.href = 'index.html'; // Redireciona para a lista
         } else {
-          alert('Ocorreu um erro ao registar o item.');
+          const erro = await response.json();
+          alert(`Ocorreu um erro ao registar o item: ${erro.error || 'Erro desconhecido'}`);
         }
       } catch (err) {
         console.error('Erro ao ligar ao servidor:', err);

@@ -5,6 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Achados e Perdidos - Escola</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos para garantir que as imagens fiquem organizadas dentro dos cards */
+    .item-media {
+      width: 100%;
+      max-height: 200px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin: 10px 0;
+      display: block;
+      background-color: #eee;
+    }
+  </style>
 </head>
 <body>
 
@@ -34,17 +46,27 @@
           return;
         }
 
-        container.innerHTML = itens.map(item => `
-          <div class="item-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <span class="badge">${item.categoria}</span>
-              <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
+        container.innerHTML = itens.map(item => {
+          // Só gera a tag <img> se existir um caminho de imagem guardado na BD
+          const imagemHtml = item.imagem_url 
+            ? `<img src="http://localhost:3000${item.imagem_url}" alt="Imagem de ${item.nome}" class="item-media">` 
+            : '';
+
+          return `
+            <div class="item-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <span class="badge">${item.categoria}</span>
+                <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
+              </div>
+              <h3>${item.nome}</h3> <!-- Corrigido de item.titulo para item.nome -->
+              
+              ${imagemHtml} <!-- A imagem aparece logo abaixo do título se existir -->
+              
+              <p>${item.descricao || 'Sem descrição adicional.'}</p>
+              <p><strong>📍 Local:</strong> ${item.local_encontrado}</p>
             </div>
-            <h3>${item.titulo}</h3>
-            <p>${item.descricao || 'Sem descrição adicional.'}</p>
-            <p><strong>📍 Local:</strong> ${item.local_encontrado}</p>
-          </div>
-        `).join('');
+          `;
+        }).join('');
 
       } catch (err) {
         console.error('Erro ao carregar itens:', err);

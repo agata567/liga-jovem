@@ -13,6 +13,17 @@
         input, select, button { padding: 8px; margin: 5px 0; width: 100%; box-sizing: border-box; }
         button { background-color: #4CAF50; color: white; border: none; cursor: pointer; border-radius: 4px; }
         button:hover { background-color: #45a049; }
+        
+        /* Novos estilos para a imagem do item */
+        .item-imagem { 
+            max-width: 100%; 
+            max-height: 250px; 
+            object-fit: cover; 
+            border-radius: 6px; 
+            margin-top: 10px; 
+            margin-bottom: 10px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -45,12 +56,21 @@
                     const statusTexto = isResgatado ? 'Dono Encontrado' : 'Aguardando Dono';
                     const statusClasse = isResgatado ? 'status-resgatado' : 'status-disponivel';
 
+                    // Constrói a tag de imagem apenas se existir um caminho guardado na BD
+                    // Como o servidor serve a raiz e a rota /uploads, o caminho relativo funciona diretamente
+                    const imagemHtml = item.imagem_url 
+                        ? `<img src="${item.imagem_url}" alt="Imagem de ${item.nome}" class="item-imagem">` 
+                        : '';
+
                     card.innerHTML = `
                         <h3>${item.nome} <small>(${item.categoria})</small></h3>
+                        
+                        ${imagemHtml} <!-- Exibe a imagem aqui -->
+
                         <p><strong>Encontrado em:</strong> ${item.local_encontrado}</p>
                         <p><strong>Descrição:</strong> ${item.descricao || 'Sem descrição'}</p>
                         <p><strong>Estado:</strong> <span class="${statusClasse}">${statusTexto}</span></p>
-                        ${item.local_recolha ? `<p><strong>Onde recolher:</strong> ${item.local_recolha}</p>` : ''}
+                        ${item.local_recolha ? `<p><strong>Onde recolher:</strong> \${item.local_recolha}</p>` : ''}
 
                         <div class="edit-form">
                             <h4>Atualizar Estado do Item</h4>
