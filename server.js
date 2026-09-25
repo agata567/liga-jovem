@@ -7,10 +7,10 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// SERVIR FICHEIROS ESTÁTICOS (HTML, CSS, JS)
+// 1. Servir todos os ficheiros estáticos (HTML, CSS, JS) da pasta
 app.use(express.static(__dirname));
 
-// ROTA PRINCIPAL: Abre o itens.html automaticamente quando acedes a http://localhost:3000
+// 2. Rota principal: quando acedes a http://localhost:3000 abre o itens.html
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'itens.html'));
 });
@@ -20,7 +20,7 @@ const db = mysql.createPool({
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'root', // Insere a tua palavra-passe se tiveres uma configurada
+    password: 'root', // A tua palavra-passe confirmada
     database: 'banco_escola',
     waitForConnections: true,
     connectionLimit: 10,
@@ -68,7 +68,18 @@ app.put('/api/itens/:id', (req, res) => {
     });
 });
 
+app.delete('/api/itens/:id', (req, res) => {
+    const { id } = req.params;
+    const query = `DELETE FROM itens WHERE id = ?`;
+
+    db.query(query, [id], (err, result) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (result.affectedRows === 0) return res.status(404).json({ message: 'Item não encontrado.' });
+        res.json({ message: 'Item eliminado com sucesso!' });
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Servidor a correr na porta ${PORT}`);
+    console.log(`Servidor a correr em http://localhost:${PORT}`);
 });
