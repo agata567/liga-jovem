@@ -6,16 +6,67 @@
   <title>Achados e Perdidos - Escola</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* Estilos para garantir que as imagens fiquem organizadas dentro dos cards */
+    /* Estilos integrados para os cartões e formulários de atualização */
+    .item-card {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      position: relative;
+    }
     .item-media {
       width: 100%;
-      max-height: 200px;
+      max-height: 250px;
       object-fit: cover;
       border-radius: 6px;
-      margin: 10px 0;
+      margin: 12px 0;
       display: block;
       background-color: #eee;
     }
+    .status-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.85em;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+    .status-disponivel { background-color: #fce8e6; color: #d9534f; }
+    .status-resgatado { background-color: #e6f4ea; color: #5cb85c; }
+    
+    .edit-form-container {
+      margin-top: 15px;
+      padding-top: 15px;
+      border-top: 1px solid #eee;
+    }
+    .edit-form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .edit-form label {
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #555;
+    }
+    .edit-form select, .edit-form input {
+      padding: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .btn-save {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 8px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .btn-save:hover { background-color: #45a049; }
   </style>
 </head>
 <body>
@@ -29,16 +80,19 @@
 
   <main>
     <div id="listaItens">
-      <!-- Os itens vão aparecer aqui via JS -->
+      <p style="text-align: center;">A carregar itens...</p>
     </div>
   </main>
 
   <script>
+    const API_URL = 'http://localhost:3000/api/itens';
+
+    // Carregar os itens ao abrir a página
     async function carregarItens() {
       const container = document.getElementById('listaItens');
       
       try {
-        const res = await fetch('http://localhost:3000/api/itens');
+        const res = await fetch(API_URL);
         const itens = await res.json();
 
         if (itens.length === 0) {
@@ -47,7 +101,11 @@
         }
 
         container.innerHTML = itens.map(item => {
-          // Só gera a tag <img> se existir um caminho de imagem guardado na BD
+          const isResgatado = item.status === 'resgatado';
+          const statusTexto = isResgatado ? 'Dono Encontrado' : 'Aguardando Dono';
+          const statusClasse = isResgatado ? 'status-resgatado' : 'status-disponivel';
+
+          // Exibe a tag de imagem apenas se existir caminho na BD
           const imagemHtml = item.imagem_url 
             ? `<img src="http://localhost:3000${item.imagem_url}" alt="Imagem de ${item.nome}" class="item-media">` 
             : '';
@@ -58,12 +116,31 @@
                 <span class="badge">${item.categoria}</span>
                 <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
               </div>
-              <h3>${item.nome}</h3> <!-- Corrigido de item.titulo para item.nome -->
               
-              ${imagemHtml} <!-- A imagem aparece logo abaixo do título se existir -->
+              <h3>${item.nome}</h3>
               
+              ${imagemHtml}
+
               <p>${item.descricao || 'Sem descrição adicional.'}</p>
-              <p><strong>📍 Local:</strong> ${item.local_encontrado}</p>
+              <p><strong>📍 Local encontrado:</strong> ${item.local_encontrado}</p>
+              <p><strong>Estado:</strong> <span class="status-badge ${statusClasse}">${statusTexto}</span></p>
+              ${item.local_recolha ? `<p><strong>Onde recolher:</strong> \${item.local_recolha}</p>` : ''}
+
+              <!-- Formulário integrado do itens.html para atualizar estado -->
+              <div class="edit-form-container">
+                <form class="edit-form" onsubmit="atualizarItem(event, ${item.id})">
+                  <label>Alterar Estado:</label>
+                  <select id="status-${item.id}">
+                    <option value="disponivel" ${item.status === 'disponivel' ? 'selected' : ''}>Aguardando Dono</option>
+                    <option value="resgatado" ${item.status === 'resgatado' ? 'selected' : ''}>Dono Encontrado</option>
+                  </select>
+
+                  <label>Onde pode ser recolhido?</label>
+                  <input type="text" id="recolha-${item.id}" placeholder="Ex: Portaria Principal, Secretaria" value="${item.local_recolha || ''}" required>
+
+                  <button type="submit" class="btn-save">Guardar Alteração</button>
+                </form>
+              </div>
             </div>
           `;
         }).join('');
@@ -74,13 +151,40 @@
       }
     }
 
+    // Atualizar Estado do Item (PUT)
+    async function atualizarItem(event, id) {
+      event.preventDefault();
+
+      const status = document.getElementById(`status-${id}`).value;
+      const local_recolha = document.getElementById(`recolha-${id}`).value;
+
+      try {
+        const response = await fetch(`${API_URL}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status, local_recolha })
+        });
+
+        if (response.ok) {
+          alert('Informações atualizadas com sucesso!');
+          carregarItens();
+        } else {
+          alert('Erro ao atualizar o item.');
+        }
+      } catch (error) {
+        console.error('Erro:', error);
+        alert('Erro de conexão com o servidor.');
+      }
+    }
+
+    // Eliminar item (DELETE)
     async function eliminarItem(id) {
       if (!confirm('Tem a certeza que deseja eliminar este item?')) return;
 
       try {
-        const res = await fetch(`http://localhost:3000/api/itens/${id}`, { method: 'DELETE' });
+        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
         if (res.ok) {
-          carregarItens(); // Atualiza a lista automaticamente
+          carregarItens();
         } else {
           alert('Erro ao eliminar item.');
         }
@@ -89,6 +193,7 @@
       }
     }
 
+    // Inicializa a listagem
     carregarItens();
   </script>
 </body>
