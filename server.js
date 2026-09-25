@@ -44,9 +44,34 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage: storage, fileFilter: fileFilter });
 
-// 2. Rota principal ajustada: agora aponta diretamente para o index.html unificado
+// 2. Rota principal inteligente com diagnóstico de erros automático
 app.get('/', (req, res) => {
-    res.sendFile(path.join(pastaProjeto, 'index.html'));
+    const caminhoIndex = path.join(pastaProjeto, 'index.html');
+    const caminhoItens = path.join(pastaProjeto, 'itens.html');
+
+    // 1º Tenta servir o index.html unificado
+    if (fs.existsSync(caminhoIndex)) {
+        return res.sendFile(caminhoIndex);
+    } 
+    // 2º Se não existir o index, tenta servir o itens.html original
+    else if (fs.existsSync(caminhoItens)) {
+        return res.sendFile(caminhoItens);
+    } 
+    // 3º Se nenhum existir, mostra um diagnóstico claro no navegador em vez de "Cannot GET /"
+    else {
+        res.status(404).send(`
+            <div style="font-family: Arial, sans-serif; padding: 30px; line-height: 1.6;">
+                <h2 style="color: #d9534f;">❌ Erro: Nenhum ficheiro HTML principal foi encontrado!</h2>
+                <p>O Express tentou procurar nas seguintes localizações:</p>
+                <ul>
+                    <li><code>${caminhoIndex}</code> (Não encontrado)</li>
+                    <li><code>${caminhoItens}</code> (Não encontrado)</li>
+                </ul>
+                <p><strong>Diretório atual do servidor:</strong> <code>${pastaProjeto}</code></p>
+                <p><strong>Como resolver:</strong> Certifique-se de que o seu ficheiro HTML unificado está guardado nesta pasta com o nome exato de <code>index.html</code> ou <code>itens.html</code>.</p>
+            </div>
+        `);
+    }
 });
 
 // Configuração da conexão com o MySQL
@@ -106,7 +131,7 @@ app.put('/api/itens/:id', (req, res) => {
     db.query(query, [status, local_recolha, id], (err, result) => {
         if (err) return res.status(500).json({ error: err.message });
         if (result.affectedRows === 0) return res.status(404).json({ message: 'Item não encontrado.' });
-        res.json({ message: 'Item atualizado com sucesso!' });
+        res.json({ message: 'Item updated com sucesso!' });
     });
 });
 
