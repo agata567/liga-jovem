@@ -6,9 +6,11 @@ async function criarTabelaNuvem() {
             host: 'mysql-12f93e75-escola-c877.h.aivencloud.com',
             port: 23292,
             user: 'avnadmin',
-            password: 'TUA_PASSWORD_DO_AIVEN', // <-- Cole aqui a password do Aiven
+            password: 'TUA_PASSWORD_DO_AIVEN',
             database: 'defaultdb',
-            ssl: { rejectUnauthorized: false }
+            ssl: {
+                rejectUnauthorized: false
+            }
         });
 
         console.log('Conectado ao Aiven com sucesso!');
