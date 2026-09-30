@@ -1,180 +1,86 @@
 const express = require('express');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 const cors = require('cors');
-const path = require('path');
-const multer = require('multer'); // 1. Importar o multer para upload de ficheiros
-const fs = require('fs');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Força o caminho absoluto para evitar erros de diretório no terminal
-const pastaProjeto = path.resolve(__dirname);
-
-// Servir ficheiros estáticos (HTML, CSS, JS) e abrir a pasta pública de uploads de fotos
-app.use(express.static(pastaProjeto));
-app.use('/uploads', express.static(path.join(pastaProjeto, 'uploads')));
-
-// Garantir que a pasta 'uploads' existe localmente para não quebrar o upload
-if (!fs.existsSync(path.join(pastaProjeto, 'uploads'))) {
-    fs.mkdirSync(path.join(pastaProjeto, 'uploads'));
-}
-
-// Configuração de Armazenamento do Multer em disco
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, path.join(pastaProjeto, 'uploads/'));
-    },
-    filename: (req, file, cb) => {
-        // Gera um nome único juntando o timestamp atual e a extensão do ficheiro original
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-        cb(null, uniqueSuffix + path.extname(file.originalname));
-    }
-});
-
-// Filtro de segurança para aceitar estritamente ficheiros de imagem
-const fileFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-        cb(null, true);
-    } else {
-        cb(new Error('Apenas são permitidas imagens!'), false);
-    }
+// Configuração da base de dados com suporte a variáveis do Render e Aiven
+const dbConfig = {
+    host: process.env.DB_HOST || 'localhost',
+    port: process.env.DB_PORT || 3306,
+    user: process.env.DB_USER || 'root',
+    password: process.env.DB_PASSWORD || '',
+    database: process.env.DB_NAME || 'banco_escola',
+    ssl: process.env.DB_HOST ? { minVersion: 'TLSv1.2', rejectUnauthorized: false } : false
 };
 
-const upload = multer({ storage: storage, fileFilter: fileFilter });
+// Criação do Pool de conexões
+const pool = mysql.createPool(dbConfig);
 
-// 2. Rota principal inteligente com diagnóstico de erros automático
-app.get('/', (req, res) => {
-    const caminhoIndex = path.join(pastaProjeto, 'index.html');
-    const caminhoItens = path.join(pastaProjeto, 'itens.html');
-
-    // 1º Tenta servir o index.html unificado
-    if (fs.existsSync(caminhoIndex)) {
-        return res.sendFile(caminhoIndex);
-    } 
-    // 2º Se não existir o index, tenta servir o itens.html original
-    else if (fs.existsSync(caminhoItens)) {
-        return res.sendFile(caminhoItens);
-    } 
-    // 3º Se nenhum existir, mostra um diagnóstico claro no navegador em vez de "Cannot GET /"
-    else {
-        res.status(404).send(`
-            <div style="font-family: Arial, sans-serif; padding: 30px; line-height: 1.6;">
-                <h2 style="color: #d9534f;">❌ Erro: Nenhum ficheiro HTML principal foi encontrado!</h2>
-                <p>O Express tentou procurar nas seguintes localizaciones:</p>
-                <ul>
-                    <li><code>${caminhoIndex}</code> (Não encontrado)</li>
-                    <li><code>${caminhoItens}</code> (Não encontrado)</li>
-                </ul>
-                <p><strong>Diretório atual do servidor:</strong> <code>${pastaProjeto}</code></p>
-                <p><strong>Como resolver:</strong> Certifique-se de que o seu ficheiro HTML unificado está guardado nesta pasta com o nome exato de <code>index.html</code> ou <code>itens.html</code>.</p>
-            </div>
+// Função para garantir que a tabela existe ao iniciar a API na nuvem
+async function inicializarBanco() {
+    try {
+        const connection = await pool.getConnection();
+        await connection.query(`
+            CREATE TABLE IF NOT EXISTS itens (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(255) NOT NULL,
+                categoria VARCHAR(100) NOT NULL,
+                local_encontrado VARCHAR(255) NOT NULL,
+                descricao TEXT,
+                status VARCHAR(50) DEFAULT 'disponivel',
+                local_recolha VARCHAR(255) DEFAULT NULL,
+                criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
         `);
+        console.log('Tabela "itens" verificada/criada com sucesso no Aiven!');
+        connection.release();
+    } catch (error) {
+        console.error('Erro ao inicializar a base de dados:', error);
+    }
+}
+
+inicializarBanco();
+
+// Rota inicial de teste
+app.get('/', (req, res) => {
+    res.send('API do Achados e Perdidos a rodar com sucesso na nuvem!');
+});
+
+// Rota para listar todos os itens
+app.get('/api/itens', async (req, res) => {
+    try {
+        const [rows] = await pool.query('SELECT * FROM itens ORDER BY criado_em DESC');
+        res.json(rows);
+    } catch (error) {
+        console.error('Erro ao procurar itens:', error);
+        res.status(500).json({ error: 'Erro interno do servidor' });
     }
 });
 
-// Configuração da conexão com o MySQL
-const db = mysql.createPool({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'root', // A tua palavra-passe confirmada
-    database: 'banco_escola',
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
-
-// Conecta ao banco e cria a coluna de imagem automaticamente caso ela não exista
-db.getConnection((err, connection) => {
-    if (err) {
-        console.error('Erro ao conectar ao MySQL:', err.message);
-    } else {
-        console.log('Conectado com sucesso ao MySQL!');
-        
-        // Verifica se a coluna imagem_url já existe na tabela itens
-        connection.query("SHOW COLUMNS FROM itens LIKE 'imagem_url'", (errColuna, results) => {
-            if (!errColuna && results.length === 0) {
-                // Se não existir, adiciona dinamicamente sem quebrar os dados existentes
-                connection.query("ALTER TABLE itens ADD COLUMN imagem_url VARCHAR(255) DEFAULT NULL", (errAlter) => {
-                    if (errAlter) {
-                        console.error('Erro ao criar a coluna imagem_url automaticamente:', errAlter.message);
-                    } else {
-                        console.log('Coluna [imagem_url] verificada e criada com sucesso no MySQL!');
-                    }
-                });
-            } else if (!errColuna) {
-                console.log('A coluna [imagem_url] já existe e está pronta para uso.');
-            }
-            connection.release(); // Libera a conexão de volta para o pool de forma segura
-        });
-    }
-});
-
-// ROTAS DA API
-
-// Listar todos os itens
-app.get('/api/itens', (req, res) => {
-    const query = `SELECT * FROM itens ORDER BY criado_em DESC`;
-    db.query(query, (err, results) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(results);
-    });
-});
-
-// Criar item integrado com upload de imagem (usando upload.single)
-app.post('/api/itens', upload.single('imagem'), (req, res) => {
-    const { nome, categoria, local_encontrado, descricao } = req.body;
+// Rota para cadastrar um novo item
+app.post('/api/itens', async (req, res) => {
+    const { nome, categoria, local_encontrado, descricao, local_recolha } = req.body;
     
-    // Se o utilizador enviou um ficheiro, guarda o caminho relativo. Caso contrário, envia null.
-    const imagem_url = req.file ? `/uploads/${req.file.filename}` : null;
+    if (!nome || !categoria || !local_encontrado) {
+        return res.status(400).json({ error: 'Campos obrigatórios em falta.' });
+    }
 
-    const query = `INSERT INTO itens (nome, categoria, local_encontrado, descricao, imagem_url) VALUES (?, ?, ?, ?, ?)`;
-
-    db.query(query, [nome, categoria, local_encontrado, descricao, imagem_url], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
+    try {
+        const [result] = await pool.query(
+            'INSERT INTO itens (nome, categoria, local_encontrado, descricao, local_recolha) VALUES (?, ?, ?, ?, ?)',
+            [nome, categoria, local_encontrado, descricao || null, local_recolha || null]
+        );
         res.status(201).json({ message: 'Item registado com sucesso!', id: result.insertId });
-    });
+    } catch (error) {
+        console.error('Erro ao inserir item:', error);
+        res.status(500).json({ error: 'Erro ao guardar na base de dados' });
+    }
 });
 
-// Atualizar item (Status e local de recolha)
-app.put('/api/itens/:id', (req, res) => {
-    const { id } = req.params;
-    const { status, local_recolha } = req.body;
-
-    const query = `UPDATE itens SET status = ?, local_recolha = ? WHERE id = ?`;
-
-    db.query(query, [status, local_recolha, id], (err, result) => {
-        if (err) return res.status(500).json({ error: err.message });
-        if (result.affectedRows === 0) return res.status(404).json({ message: 'Item não encontrado.' });
-        res.json({ message: 'Item atualizado com sucesso!' });
-    });
-});
-
-// Eliminar item (E apagar automaticamente o ficheiro físico da imagem na pasta uploads)
-app.delete('/api/itens/:id', (req, res) => {
-    const { id } = req.params;
-
-    // Procura o caminho da foto antes de deletar o registo do banco
-    db.query('SELECT imagem_url FROM itens WHERE id = ?', [id], (err, results) => {
-        if (!err && results.length > 0 && results[0].imagem_url) {
-            const filePath = path.join(pastaProjeto, results[0].imagem_url);
-            if (fs.existsSync(filePath)) {
-                fs.unlinkSync(filePath); // Elimina a foto antiga do servidor local
-            }
-        }
-
-        const query = `DELETE FROM itens WHERE id = ?`;
-        db.query(query, [id], (err, result) => {
-            if (err) return res.status(500).json({ error: err.message });
-            if (result.affectedRows === 0) return res.status(404).json({ message: 'Item não encontrado.' });
-            res.json({ message: 'Item eliminado com sucesso!' });
-        });
-    });
-});
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
-    console.log(`Servidor a correr em http://localhost:${PORT}`);
+    console.log(`Servidor a rodar na porta ${PORT}`);
 });
