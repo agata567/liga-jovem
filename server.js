@@ -11,9 +11,8 @@ const dbConfig = {
     host: process.env.DB_HOST || 'localhost',
     port: process.env.DB_PORT || 3306,
     user: process.env.DB_USER || 'root',
-    password: process.env.DB_PASSWORD || 'root', // Coloque a sua palavra-passe se existir
-    database: process.env.DB_NAME || 'liga_jovem',
-    ssl: process.env.DB_HOST ? { minVersion: 'TLSv1.2', rejectUnauthorized: false } : false
+    password: process.env.DB_PASSWORD || 'root',
+    database: process.env.DB_NAME || 'liga_jovem'
 };
 
 // Criação do Pool de conexões
