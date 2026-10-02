@@ -1,34 +1,8 @@
 <script>
-  // URL base da API alojada no Render
-  const API_URL = 'https://SEU-APP-NO-RENDER.onrender.com/api/itens';
+  // URL base da API local
+  const API_URL = 'http://localhost:3001/api/utilizadores';
 
-  const inputImagem = document.getElementById('imagem');
-  const previewContainer = document.getElementById('previewContainer');
-  const imagePreview = document.getElementById('imagePreview');
   const btnSubmit = document.getElementById('btnSubmit');
-
-  // Pré-visualização da imagem antes do envio
-  inputImagem.addEventListener('change', function () {
-    const file = this.files[0];
-
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) { // Limite de 5MB
-        alert('A imagem selecionada excede o limite de 5MB.');
-        this.value = '';
-        previewContainer.style.display = 'none';
-        return;
-      }
-
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        imagePreview.src = e.target.result;
-        previewContainer.style.display = 'block';
-      };
-      reader.readAsDataURL(file);
-    } else {
-      previewContainer.style.display = 'none';
-    }
-  });
 
   // Envio do formulário
   document.getElementById('formCadastro').addEventListener('submit', async (e) => {
@@ -39,33 +13,31 @@
     const textoOriginal = btnSubmit.textContent;
     btnSubmit.textContent = 'A registar...';
 
-    const formData = new FormData();
-    formData.append('nome', document.getElementById('titulo').value.trim());
-    formData.append('categoria', document.getElementById('categoria').value);
-    formData.append('local_encontrado', document.getElementById('local').value.trim());
-    formData.append('descricao', document.getElementById('descricao').value.trim());
-
-    if (inputImagem.files.length > 0) {
-      formData.append('imagem', inputImagem.files[0]);
-    }
+    // Obtém os dados dos inputs do formulário
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
 
     try {
-      // Faz o pedido POST diretamente para a URL do Render
+      // Faz o pedido POST enviando JSON para o Node.js
       const response = await fetch(API_URL, {
         method: 'POST',
-        body: formData 
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ nome, email })
       });
 
+      const dados = await response.json();
+
       if (response.ok) {
-        alert('Item registado com sucesso!');
-        window.location.href = 'index.html';
+        alert(dados.message || 'Utilizador registado com sucesso!');
+        window.location.href = 'index.html'; // Redireciona para a lista
       } else {
-        const erro = await response.json();
-        alert(`Ocorreu um erro ao registar o item: ${erro.error || 'Erro desconhecido'}`);
+        alert(`Ocorreu um erro: ${dados.error || 'Erro desconhecido'}`);
       }
     } catch (err) {
       console.error('Erro ao ligar ao servidor:', err);
-      alert('Servidor indisponível. Verifique se o serviço no Render está ativo.');
+      alert('Servidor indisponível. Verifique se o server.js está a rodar no terminal.');
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.textContent = textoOriginal;
