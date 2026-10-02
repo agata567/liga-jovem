@@ -1,98 +1,74 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cadastrar Item - Achados e Perdidos</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <header>
-    <h1>Achados e Perdidos</h1>
-    <div class="nav-buttons">
-      <a href="index.html" class="btn btn-secondary">Ver Lista de Itens</a>
-    </div>
-  </header>
+<script>
+  // URL base da API alojada no Render
+  const API_URL = 'https://SEU-APP-NO-RENDER.onrender.com/api/itens';
 
-  <main>
-    <form id="formCadastro" enctype="multipart/form-data"> <!-- Adicionado suporte a ficheiros no form -->
-      <h2>Cadastrar Novo Item</h2>
-      
-      <div class="form-group">
-        <label for="titulo">Nome do Objeto</label>
-        <!-- Mantido o id="titulo" no HTML para não quebrar estilos, mas mapeado como "nome" no JS -->
-        <input type="text" id="titulo" placeholder="Ex: Casaco azul, Chaveiro..." required>
-      </div>
+  const inputImagem = document.getElementById('imagem');
+  const previewContainer = document.getElementById('previewContainer');
+  const imagePreview = document.getElementById('imagePreview');
+  const btnSubmit = document.getElementById('btnSubmit');
 
-      <div class="form-group">
-        <label for="categoria">Categoria</label>
-        <select id="categoria" required>
-          <option value="">Selecione...</option>
-          <option value="Eletrónicos">Eletrónicos</option>
-          <option value="Roupas">Roupas</option>
-          <option value="Documentos">Documentos / Material</option>
-          <option value="Outros">Outros</option>
-        </select>
-      </div>
+  // Pré-visualização da imagem antes do envio
+  inputImagem.addEventListener('change', function () {
+    const file = this.files[0];
 
-      <div class="form-group">
-        <label for="local">Local Onde Foi Encontrado</label>
-        <input type="text" id="local" placeholder="Ex: Pátio, Sala 12, Cantina" required>
-      </div>
-
-      <div class="form-group">
-        <label for="descricao">Descrição Detalhada</label>
-        <textarea id="descricao" rows="3" placeholder="Insira detalhes como cor, marca ou marcas de uso..."></textarea>
-      </div>
-
-      <!-- Novo campo para carregar a foto do item -->
-      <div class="form-group">
-        <label for="imagem">Foto do Item (Opcional)</label>
-        <input type="file" id="imagem" accept="image/*">
-      </div>
-
-      <button type="submit" class="btn">Registar Item</button>
-    </form>
-  </main>
-
-  <script>
-    document.getElementById('formCadastro').addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // Instancia o FormData para agrupar textos e ficheiros binários
-      const formData = new FormData();
-      
-      // Mapeia os dados nos campos esperados pelo seu Back-End (nome, categoria, local_encontrado, descricao)
-      formData.append('nome', document.getElementById('titulo').value);
-      formData.append('categoria', document.getElementById('categoria').value);
-      formData.append('local_encontrado', document.getElementById('local').value);
-      formData.append('descricao', document.getElementById('descricao').value);
-
-      // Verifica se o utilizador selecionou alguma imagem antes de anexar
-      const inputImagem = document.getElementById('imagem');
-      if (inputImagem.files.length > 0) {
-        formData.append('imagem', inputImagem.files[0]); // O nome 'imagem' deve ser igual ao do upload.single('imagem') no backend
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) { // Limite de 5MB
+        alert('A imagem selecionada excede o limite de 5MB.');
+        this.value = '';
+        previewContainer.style.display = 'none';
+        return;
       }
 
-      try {
-        const response = await fetch('http://localhost:3000/api/itens', {
-          method: 'POST',
-          // ATENÇÃO: Não adicione 'Content-Type' nos headers. O browser define o boundary automaticamente ao enviar um FormData.
-          body: formData 
-        });
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imagePreview.src = e.target.result;
+        previewContainer.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    } else {
+      previewContainer.style.display = 'none';
+    }
+  });
 
-        if (response.ok) {
-          alert('Item registado com sucesso!');
-          window.location.href = 'index.html'; // Redireciona para a lista
-        } else {
-          const erro = await response.json();
-          alert(`Ocorreu um erro ao registar o item: ${erro.error || 'Erro desconhecido'}`);
-        }
-      } catch (err) {
-        console.error('Erro ao ligar ao servidor:', err);
-        alert('Servidor indisponível. Verifique se o Back-End está em execução.');
+  // Envio do formulário
+  document.getElementById('formCadastro').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Bloqueia o botão para evitar envios duplicados
+    btnSubmit.disabled = true;
+    const textoOriginal = btnSubmit.textContent;
+    btnSubmit.textContent = 'A registar...';
+
+    const formData = new FormData();
+    formData.append('nome', document.getElementById('titulo').value.trim());
+    formData.append('categoria', document.getElementById('categoria').value);
+    formData.append('local_encontrado', document.getElementById('local').value.trim());
+    formData.append('descricao', document.getElementById('descricao').value.trim());
+
+    if (inputImagem.files.length > 0) {
+      formData.append('imagem', inputImagem.files[0]);
+    }
+
+    try {
+      // Faz o pedido POST diretamente para a URL do Render
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        body: formData 
+      });
+
+      if (response.ok) {
+        alert('Item registado com sucesso!');
+        window.location.href = 'index.html';
+      } else {
+        const erro = await response.json();
+        alert(`Ocorreu um erro ao registar o item: ${erro.error || 'Erro desconhecido'}`);
       }
-    });
-  </script>
-</body>
-</html>
+    } catch (err) {
+      console.error('Erro ao ligar ao servidor:', err);
+      alert('Servidor indisponível. Verifique se o serviço no Render está ativo.');
+    } finally {
+      btnSubmit.disabled = false;
+      btnSubmit.textContent = textoOriginal;
+    }
+  });
+</script>

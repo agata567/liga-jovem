@@ -1,200 +1,129 @@
-<!DOCTYPE html>
-<html lang="pt">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Achados e Perdidos - Escola</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* Estilos integrados para os cartões e formulários de atualização */
-    .item-card {
-      background: white;
-      padding: 20px;
-      margin-bottom: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      position: relative;
-    }
-    .item-media {
-      width: 100%;
-      max-height: 250px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin: 12px 0;
-      display: block;
-      background-color: #eee;
-    }
-    .status-badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 0.85em;
-      font-weight: bold;
-      margin-top: 5px;
-    }
-    .status-disponivel { background-color: #fce8e6; color: #d9534f; }
-    .status-resgatado { background-color: #e6f4ea; color: #5cb85c; }
+<script>
+  // URL base do servidor no Render (substitua com o seu domínio do Render)
+  const BASE_URL = 'https://SEU-APP-NO-RENDER.onrender.com';
+  const API_URL = `${BASE_URL}/api/itens`;
+
+  // Função de auxílio para evitar ataques XSS
+  function escapeHTML(str) {
+    if (!str) return '';
+    return String(str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  // Carregar os itens ao abrir a página
+  async function carregarItens() {
+    const container = document.getElementById('listaItens');
     
-    .edit-form-container {
-      margin-top: 15px;
-      padding-top: 15px;
-      border-top: 1px solid #eee;
-    }
-    .edit-form {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .edit-form label {
-      font-size: 0.9em;
-      font-weight: bold;
-      color: #555;
-    }
-    .edit-form select, .edit-form input {
-      padding: 6px;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      width: 100%;
-      box-sizing: border-box;
-    }
-    .btn-save {
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      padding: 8px;
-      cursor: pointer;
-      border-radius: 4px;
-      font-weight: bold;
-    }
-    .btn-save:hover { background-color: #45a049; }
-  </style>
-</head>
-<body>
+    try {
+      const res = await fetch(API_URL);
+      const itens = await res.json();
 
-  <header>
-    <h1>🔍 Achados e Perdidos</h1>
-    <div class="nav-buttons">
-      <a href="cadastrar_item.html" class="btn">+ Novo Item</a>
-    </div>
-  </header>
+      if (itens.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum item registado no momento.</p>';
+        return;
+      }
 
-  <main>
-    <div id="listaItens">
-      <p style="text-align: center;">A carregar itens...</p>
-    </div>
-  </main>
+      container.innerHTML = itens.map(item => {
+        const isResgatado = item.status === 'resgatado';
+        const statusTexto = isResgatado ? 'Dono Encontrado' : 'Aguardando Dono';
+        const statusClasse = isResgatado ? 'status-resgatado' : 'status-disponivel';
 
-  <script>
-    const API_URL = 'http://localhost:3000/api/itens';
+        // Garante que o caminho da imagem utiliza a URL do Render
+        const imagemSrc = item.imagem_url 
+          ? (item.imagem_url.startsWith('http') ? item.imagem_url : `${BASE_URL}${item.imagem_url}`)
+          : null;
 
-    // Carregar os itens ao abrir a página
-    async function carregarItens() {
-      const container = document.getElementById('listaItens');
-      
-      try {
-        const res = await fetch(API_URL);
-        const itens = await res.json();
+        const imagemHtml = imagemSrc 
+          ? `<img src="${escapeHTML(imagemSrc)}" alt="Imagem de ${escapeHTML(item.nome)}" class="item-media">` 
+          : '';
 
-        if (itens.length === 0) {
-          container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum item registado no momento.</p>';
-          return;
-        }
-
-        container.innerHTML = itens.map(item => {
-          const isResgatado = item.status === 'resgatado';
-          const statusTexto = isResgatado ? 'Dono Encontrado' : 'Aguardando Dono';
-          const statusClasse = isResgatado ? 'status-resgatado' : 'status-disponivel';
-
-          // Exibe a tag de imagem apenas se existir caminho na BD
-          const imagemHtml = item.imagem_url 
-            ? `<img src="http://localhost:3000${item.imagem_url}" alt="Imagem de ${item.nome}" class="item-media">` 
-            : '';
-
-          return `
-            <div class="item-card">
-              <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-                <span class="badge">${item.categoria}</span>
-                <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
-              </div>
-              
-              <h3>${item.nome}</h3>
-              
-              ${imagemHtml}
-
-              <p>${item.descricao || 'Sem descrição adicional.'}</p>
-              <p><strong>📍 Local encontrado:</strong> ${item.local_encontrado}</p>
-              <p><strong>Estado:</strong> <span class="status-badge ${statusClasse}">${statusTexto}</span></p>
-              ${item.local_recolha ? `<p><strong>Onde recolher:</strong> \${item.local_recolha}</p>` : ''}
-
-              <!-- Formulário integrado do itens.html para atualizar estado -->
-              <div class="edit-form-container">
-                <form class="edit-form" onsubmit="atualizarItem(event, ${item.id})">
-                  <label>Alterar Estado:</label>
-                  <select id="status-${item.id}">
-                    <option value="disponivel" ${item.status === 'disponivel' ? 'selected' : ''}>Aguardando Dono</option>
-                    <option value="resgatado" ${item.status === 'resgatado' ? 'selected' : ''}>Dono Encontrado</option>
-                  </select>
-
-                  <label>Onde pode ser recolhido?</label>
-                  <input type="text" id="recolha-${item.id}" placeholder="Ex: Portaria Principal, Secretaria" value="${item.local_recolha || ''}" required>
-
-                  <button type="submit" class="btn-save">Guardar Alteração</button>
-                </form>
-              </div>
+        return `
+          <div class="item-card">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <span class="badge">${escapeHTML(item.categoria)}</span>
+              <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
             </div>
-          `;
-        }).join('');
+            
+            <h3>${escapeHTML(item.nome)}</h3>
+            
+            ${imagemHtml}
 
-      } catch (err) {
-        console.error('Erro ao carregar itens:', err);
-        container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar lista de itens.</p>';
-      }
+            <p>${escapeHTML(item.descricao) || 'Sem descrição adicional.'}</p>
+            <p><strong>📍 Local encontrado:</strong> ${escapeHTML(item.local_encontrado)}</p>
+            <p><strong>Estado:</strong> <span class="status-badge ${statusClasse}">${statusTexto}</span></p>
+            ${item.local_recolha ? `<p><strong>Onde recolher:</strong> ${escapeHTML(item.local_recolha)}</p>` : ''}
+
+            <!-- Formulário integrado para atualizar estado -->
+            <div class="edit-form-container">
+              <form class="edit-form" onsubmit="atualizarItem(event, ${item.id})">
+                <label>Alterar Estado:</label>
+                <select id="status-${item.id}">
+                  <option value="disponivel" ${item.status === 'disponivel' ? 'selected' : ''}>Aguardando Dono</option>
+                  <option value="resgatado" ${item.status === 'resgatado' ? 'selected' : ''}>Dono Encontrado</option>
+                </select>
+
+                <label>Onde pode ser recolhido?</label>
+                <input type="text" id="recolha-${item.id}" placeholder="Ex: Portaria Principal, Secretaria" value="${escapeHTML(item.local_recolha || '')}" required>
+
+                <button type="submit" class="btn-save">Guardar Alteração</button>
+              </form>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+    } catch (err) {
+      console.error('Erro ao carregar itens:', err);
+      container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar lista de itens.</p>';
     }
+  }
 
-    // Atualizar Estado do Item (PUT)
-    async function atualizarItem(event, id) {
-      event.preventDefault();
+  // Atualizar Estado do Item (PUT)
+  async function atualizarItem(event, id) {
+    event.preventDefault();
 
-      const status = document.getElementById(`status-${id}`).value;
-      const local_recolha = document.getElementById(`recolha-${id}`).value;
+    const status = document.getElementById(`status-${id}`).value;
+    const local_recolha = document.getElementById(`recolha-${id}`).value;
 
-      try {
-        const response = await fetch(`${API_URL}/${id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status, local_recolha })
-        });
+    try {
+      const response = await fetch(`${API_URL}/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status, local_recolha })
+      });
 
-        if (response.ok) {
-          alert('Informações atualizadas com sucesso!');
-          carregarItens();
-        } else {
-          alert('Erro ao atualizar o item.');
-        }
-      } catch (error) {
-        console.error('Erro:', error);
-        alert('Erro de conexão com o servidor.');
+      if (response.ok) {
+        alert('Informações atualizadas com sucesso!');
+        carregarItens();
+      } else {
+        alert('Erro ao atualizar o item.');
       }
+    } catch (error) {
+      console.error('Erro:', error);
+      alert('Erro de conexão com o servidor no Render.');
     }
+  }
 
-    // Eliminar item (DELETE)
-    async function eliminarItem(id) {
-      if (!confirm('Tem a certeza que deseja eliminar este item?')) return;
+  // Eliminar item (DELETE)
+  async function eliminarItem(id) {
+    if (!confirm('Tem a certeza que deseja eliminar este item?')) return;
 
-      try {
-        const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-        if (res.ok) {
-          carregarItens();
-        } else {
-          alert('Erro ao eliminar item.');
-        }
-      } catch (err) {
-        alert('Servidor indisponível.');
+    try {
+      const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        carregarItens();
+      } else {
+        alert('Erro ao eliminar item.');
       }
+    } catch (err) {
+      alert('Servidor indisponível.');
     }
+  }
 
-    // Inicializa a listagem
-    carregarItens();
-  </script>
-</body>
-</html>
+  // Inicializa a listagem
+  carregarItens();
+</script>
