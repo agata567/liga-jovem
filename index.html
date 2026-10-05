@@ -1,11 +1,10 @@
 <script>
-  // URL base do servidor no Render (substitua com o seu domínio do Render)
-  const BASE_URL = 'https://SEU-APP-NO-RENDER.onrender.com';
-  const API_URL = `${BASE_URL}/api/itens`;
+  // URL da API (altere para a URL do Render em produção)
+  const API_URL = 'http://localhost:3001/api/utilizadores';
 
-  // Função de auxílio para evitar ataques XSS
+  // Função para evitar vulnerabilidades de XSS ao renderizar textos do utilizador
   function escapeHTML(str) {
-    if (!str) return '';
+    if (str === null || str === undefined) return '';
     return String(str)
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
@@ -14,116 +13,38 @@
       .replace(/'/g, "&#039;");
   }
 
-  // Carregar os itens ao abrir a página
-  async function carregarItens() {
-    const container = document.getElementById('listaItens');
-    
+  // Carrega os utilizadores ao abrir a página
+  async function carregarUtilizadores() {
+    const container = document.getElementById('listaUtilizadores');
+    if (!container) return;
+
     try {
       const res = await fetch(API_URL);
-      const itens = await res.json();
+      const utilizadores = await res.json();
 
-      if (itens.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Nenhum item registado no momento.</p>';
+      if (!Array.isArray(utilizadores) || utilizadores.length === 0) {
+        container.innerHTML = '<p style="text-align: center; color: #666;">Nenhum utilizador registado até ao momento.</p>';
         return;
       }
 
-      container.innerHTML = itens.map(item => {
-        const isResgatado = item.status === 'resgatado';
-        const statusTexto = isResgatado ? 'Dono Encontrado' : 'Aguardando Dono';
-        const statusClasse = isResgatado ? 'status-resgatado' : 'status-disponivel';
-
-        // Garante que o caminho da imagem utiliza a URL do Render
-        const imagemSrc = item.imagem_url 
-          ? (item.imagem_url.startsWith('http') ? item.imagem_url : `${BASE_URL}${item.imagem_url}`)
-          : null;
-
-        const imagemHtml = imagemSrc 
-          ? `<img src="${escapeHTML(imagemSrc)}" alt="Imagem de ${escapeHTML(item.nome)}" class="item-media">` 
-          : '';
+      container.innerHTML = utilizadores.map(user => {
+        const dataCriacao = new Date(user.criado_em).toLocaleDateString('pt-PT');
 
         return `
-          <div class="item-card">
-            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-              <span class="badge">${escapeHTML(item.categoria)}</span>
-              <button onclick="eliminarItem(${item.id})" class="btn-delete" title="Apagar item">🗑️</button>
-            </div>
-            
-            <h3>${escapeHTML(item.nome)}</h3>
-            
-            ${imagemHtml}
-
-            <p>${escapeHTML(item.descricao) || 'Sem descrição adicional.'}</p>
-            <p><strong>📍 Local encontrado:</strong> ${escapeHTML(item.local_encontrado)}</p>
-            <p><strong>Estado:</strong> <span class="status-badge ${statusClasse}">${statusTexto}</span></p>
-            ${item.local_recolha ? `<p><strong>Onde recolher:</strong> ${escapeHTML(item.local_recolha)}</p>` : ''}
-
-            <!-- Formulário integrado para atualizar estado -->
-            <div class="edit-form-container">
-              <form class="edit-form" onsubmit="atualizarItem(event, ${item.id})">
-                <label>Alterar Estado:</label>
-                <select id="status-${item.id}">
-                  <option value="disponivel" ${item.status === 'disponivel' ? 'selected' : ''}>Aguardando Dono</option>
-                  <option value="resgatado" ${item.status === 'resgatado' ? 'selected' : ''}>Dono Encontrado</option>
-                </select>
-
-                <label>Onde pode ser recolhido?</label>
-                <input type="text" id="recolha-${item.id}" placeholder="Ex: Portaria Principal, Secretaria" value="${escapeHTML(item.local_recolha || '')}" required>
-
-                <button type="submit" class="btn-save">Guardar Alteração</button>
-              </form>
-            </div>
+          <div class="card-utilizador" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
+            <h3 style="margin: 0 0 5px 0;">${escapeHTML(user.nome)}</h3>
+            <p style="margin: 0 0 5px 0;"><strong>E-mail:</strong> ${escapeHTML(user.email)}</p>
+            <small style="color: #888;">Registado em: ${dataCriacao}</small>
           </div>
         `;
       }).join('');
 
     } catch (err) {
-      console.error('Erro ao carregar itens:', err);
-      container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar lista de itens.</p>';
+      console.error('Erro ao carregar utilizadores:', err);
+      container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar a lista de utilizadores. Verifique se o servidor está ativo.</p>';
     }
   }
 
-  // Atualizar Estado do Item (PUT)
-  async function atualizarItem(event, id) {
-    event.preventDefault();
-
-    const status = document.getElementById(`status-${id}`).value;
-    const local_recolha = document.getElementById(`recolha-${id}`).value;
-
-    try {
-      const response = await fetch(`${API_URL}/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status, local_recolha })
-      });
-
-      if (response.ok) {
-        alert('Informações atualizadas com sucesso!');
-        carregarItens();
-      } else {
-        alert('Erro ao atualizar o item.');
-      }
-    } catch (error) {
-      console.error('Erro:', error);
-      alert('Erro de conexão com o servidor no Render.');
-    }
-  }
-
-  // Eliminar item (DELETE)
-  async function eliminarItem(id) {
-    if (!confirm('Tem a certeza que deseja eliminar este item?')) return;
-
-    try {
-      const res = await fetch(`${API_URL}/${id}`, { method: 'DELETE' });
-      if (res.ok) {
-        carregarItens();
-      } else {
-        alert('Erro ao eliminar item.');
-      }
-    } catch (err) {
-      alert('Servidor indisponível.');
-    }
-  }
-
-  // Inicializa a listagem
-  carregarItens();
+  // Inicializa o carregamento da lista
+  carregarUtilizadores();
 </script>
