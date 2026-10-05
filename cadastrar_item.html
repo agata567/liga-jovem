@@ -1,24 +1,27 @@
 <script>
-  // URL base da API local
+  // URL base da API (altere para a URL do Render em produção, se necessário)
   const API_URL = 'http://localhost:3001/api/utilizadores';
 
   const btnSubmit = document.getElementById('btnSubmit');
 
-  // Envio do formulário
   document.getElementById('formCadastro').addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    const nome = document.getElementById('nome').value.trim();
+    const email = document.getElementById('email').value.trim();
+
+    // Validação básica do e-mail
+    if (!email.includes('@') || !email.includes('.')) {
+      alert('Por favor, insira um endereço de e-mail válido.');
+      return;
+    }
 
     // Bloqueia o botão para evitar envios duplicados
     btnSubmit.disabled = true;
     const textoOriginal = btnSubmit.textContent;
     btnSubmit.textContent = 'A registar...';
 
-    // Obtém os dados dos inputs do formulário
-    const nome = document.getElementById('nome').value.trim();
-    const email = document.getElementById('email').value.trim();
-
     try {
-      // Faz o pedido POST enviando JSON para o Node.js
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: {
@@ -27,17 +30,22 @@
         body: JSON.stringify({ nome, email })
       });
 
-      const dados = await response.json();
+      let dados;
+      try {
+        dados = await response.json();
+      } catch (e) {
+        dados = { error: 'Resposta inválida do servidor.' };
+      }
 
       if (response.ok) {
         alert(dados.message || 'Utilizador registado com sucesso!');
-        window.location.href = 'index.html'; // Redireciona para a lista
+        window.location.href = 'index.html';
       } else {
         alert(`Ocorreu um erro: ${dados.error || 'Erro desconhecido'}`);
       }
     } catch (err) {
       console.error('Erro ao ligar ao servidor:', err);
-      alert('Servidor indisponível. Verifique se o server.js está a rodar no terminal.');
+      alert('Servidor indisponível. Verifique a ligação.');
     } finally {
       btnSubmit.disabled = false;
       btnSubmit.textContent = textoOriginal;
