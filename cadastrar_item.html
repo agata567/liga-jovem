@@ -1,54 +1,85 @@
-<script>
-  // URL base da API (altere para a URL do Render em produção, se necessário)
-  const API_URL = 'http://localhost:3001/api/utilizadores';
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Item - Liga Jovem</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Cadastrar Novo Item</h1>
+    <a href="index.html" class="btn">Voltar</a>
+  </header>
 
-  const btnSubmit = document.getElementById('btnSubmit');
+  <main>
+    <form id="formItem" enctype="multipart/form-data">
+      <label for="titulo">Título do Item *</label>
+      <input type="text" id="titulo" name="titulo" required placeholder="Ex: Casaco de Frio">
 
-  document.getElementById('formCadastro').addEventListener('submit', async (e) => {
-    e.preventDefault();
+      <label for="descricao">Descrição</label>
+      <textarea id="descricao" name="descricao" rows="4" placeholder="Detalhes sobre o item..."></textarea>
 
-    const nome = document.getElementById('nome').value.trim();
-    const email = document.getElementById('email').value.trim();
+      <label for="status">Estado</label>
+      <select id="status" name="status">
+        <option value="disponivel">Disponível</option>
+        <option value="resgatado">Resgatado</option>
+      </select>
 
-    // Validação básica do e-mail
-    if (!email.includes('@') || !email.includes('.')) {
-      alert('Por favor, insira um endereço de e-mail válido.');
-      return;
-    }
+      <label for="imagem">Imagem do Item</label>
+      <input type="file" id="imagem" name="imagem" accept="image/*">
 
-    // Bloqueia o botão para evitar envios duplicados
-    btnSubmit.disabled = true;
-    const textoOriginal = btnSubmit.textContent;
-    btnSubmit.textContent = 'A registar...';
+      <button type="submit" id="btnSubmit">Guardar Item</button>
+    </form>
+  </main>
 
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ nome, email })
-      });
+  <script>
+    const API_URL = 'http://localhost:3001/api/itens';
+    const form = document.getElementById('formItem');
+    const btnSubmit = document.getElementById('btnSubmit');
 
-      let dados;
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const titulo = document.getElementById('titulo').value.trim();
+      if (!titulo) {
+        alert('Por favor, introduza o título do item.');
+        return;
+      }
+
+      btnSubmit.disabled = true;
+      const textoOriginal = btnSubmit.textContent;
+      btnSubmit.textContent = 'A guardar...';
+
+      const formData = new FormData(form);
+
       try {
-        dados = await response.json();
-      } catch (e) {
-        dados = { error: 'Resposta inválida do servidor.' };
-      }
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: formData
+        });
 
-      if (response.ok) {
-        alert(dados.message || 'Utilizador registado com sucesso!');
-        window.location.href = 'index.html';
-      } else {
-        alert(`Ocorreu um erro: ${dados.error || 'Erro desconhecido'}`);
+        let dados;
+        try {
+          dados = await response.json();
+        } catch (e) {
+          dados = { error: 'Resposta inválida do servidor.' };
+        }
+
+        if (response.ok) {
+          alert(dados.message || 'Item registado com sucesso!');
+          window.location.href = 'index.html';
+        } else {
+          alert(`Ocorreu um erro: ${dados.error || 'Erro desconhecido'}`);
+        }
+      } catch (err) {
+        console.error('Erro ao ligar ao servidor:', err);
+        alert('Servidor indisponível. Verifique se o backend está a rodar.');
+      } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.textContent = textoOriginal;
       }
-    } catch (err) {
-      console.error('Erro ao ligar ao servidor:', err);
-      alert('Servidor indisponível. Verifique a ligação.');
-    } finally {
-      btnSubmit.disabled = false;
-      btnSubmit.textContent = textoOriginal;
-    }
-  });
-</script>
+    });
+  </script>
+</body>
+</html>

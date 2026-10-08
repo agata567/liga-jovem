@@ -1,50 +1,100 @@
-<script>
-  // URL da API (altere para a URL do Render em produção)
-  const API_URL = 'http://localhost:3001/api/utilizadores';
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liga Jovem - Início</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header>
+    <h1>Liga Jovem</h1>
+    <div>
+      <a href="cadastrar_item.html" class="btn">Cadastrar Item</a>
+    </div>
+  </header>
 
-  // Função para evitar vulnerabilidades de XSS ao renderizar textos do utilizador
-  function escapeHTML(str) {
-    if (str === null || str === undefined) return '';
-    return String(str)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#039;");
-  }
+  <main>
+    <h2>Itens Registados</h2>
+    <div id="listaItens" style="margin-top: 16px;"></div>
 
-  // Carrega os utilizadores ao abrir a página
-  async function carregarUtilizadores() {
-    const container = document.getElementById('listaUtilizadores');
-    if (!container) return;
+    <h2 style="margin-top: 32px;">Utilizadores Registados</h2>
+    <div id="listaUtilizadores" style="margin-top: 16px;"></div>
+  </main>
 
-    try {
-      const res = await fetch(API_URL);
-      const utilizadores = await res.json();
+  <script>
+    const API_BASE = 'http://localhost:3001';
 
-      if (!Array.isArray(utilizadores) || utilizadores.length === 0) {
-        container.innerHTML = '<p style="text-align: center; color: #666;">Nenhum utilizador registado até ao momento.</p>';
-        return;
-      }
-
-      container.innerHTML = utilizadores.map(user => {
-        const dataCriacao = new Date(user.criado_em).toLocaleDateString('pt-PT');
-
-        return `
-          <div class="card-utilizador" style="border: 1px solid #ddd; padding: 15px; margin-bottom: 10px; border-radius: 8px;">
-            <h3 style="margin: 0 0 5px 0;">${escapeHTML(user.nome)}</h3>
-            <p style="margin: 0 0 5px 0;"><strong>E-mail:</strong> ${escapeHTML(user.email)}</p>
-            <small style="color: #888;">Registado em: ${dataCriacao}</small>
-          </div>
-        `;
-      }).join('');
-
-    } catch (err) {
-      console.error('Erro ao carregar utilizadores:', err);
-      container.innerHTML = '<p style="text-align: center; color: red;">Erro ao carregar a lista de utilizadores. Verifique se o servidor está ativo.</p>';
+    function escapeHTML(str) {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
     }
-  }
 
-  // Inicializa o carregamento da lista
-  carregarUtilizadores();
-</script>
+    async function carregarItens() {
+      const container = document.getElementById('listaItens');
+      if (!container) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/itens`);
+        const itens = await res.json();
+
+        if (!Array.isArray(itens) || itens.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-muted);">Nenhum item cadastrado até ao momento.</p>';
+          return;
+        }
+
+        container.innerHTML = itens.map(item => `
+          <div class="card">
+            ${item.imagem ? `<img src="${API_BASE}${item.imagem}" alt="${escapeHTML(item.titulo)}">` : ''}
+            <h3>${escapeHTML(item.titulo)}</h3>
+            <p>${escapeHTML(item.descricao)}</p>
+            <span class="${item.status === 'resgatado' ? 'status-resgatado' : 'status-disponivel'}">
+              ${escapeHTML(item.status)}
+            </span>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('Erro ao carregar itens:', err);
+        container.innerHTML = '<p style="color: red;">Erro ao carregar a lista de itens.</p>';
+      }
+    }
+
+    async function carregarUtilizadores() {
+      const container = document.getElementById('listaUtilizadores');
+      if (!container) return;
+
+      try {
+        const res = await fetch(`${API_BASE}/api/utilizadores`);
+        const utilizadores = await res.json();
+
+        if (!Array.isArray(utilizadores) || utilizadores.length === 0) {
+          container.innerHTML = '<p style="color: var(--text-muted);">Nenhum utilizador registado até ao momento.</p>';
+          return;
+        }
+
+        container.innerHTML = utilizadores.map(user => {
+          const dataCriacao = new Date(user.criado_em).toLocaleDateString('pt-PT');
+          return `
+            <div class="card">
+              <h3>${escapeHTML(user.nome)}</h3>
+              <p><strong>E-mail:</strong> ${escapeHTML(user.email)}</p>
+              <small style="color: var(--text-muted);">Registado em: ${dataCriacao}</small>
+            </div>
+          `;
+        }).join('');
+      } catch (err) {
+        console.error('Erro ao carregar utilizadores:', err);
+        container.innerHTML = '<p style="color: red;">Erro ao carregar a lista de utilizadores.</p>';
+      }
+    }
+
+    carregarItens();
+    carregarUtilizadores();
+  </script>
+</body>
+</html>
