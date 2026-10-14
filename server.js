@@ -4,27 +4,29 @@ const cors = require('cors');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Garante a existência da pasta de uploads
+// Garante a existência da pasta de uploads de forma segura
 if (!fs.existsSync('./uploads')) {
-  fs.mkdirSync('./uploads');
+  fs.mkdirSync('./uploads', { recursive: true });
 }
 
 // Servir arquivos estáticos da pasta uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Configuração do Multer para armazenamento de imagens
+// Configuração do Multer gerando nomes curtos e únicos (evita estourar limite no banco)
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, uniqueSuffix + path.extname(file.originalname));
+    const nomeUnico = Date.now() + '-' + crypto.randomBytes(4).toString('hex');
+    const extensao = path.extname(file.originalname).toLowerCase();
+    cb(null, nomeUnico + extensao);
   }
 });
 const upload = multer({ storage });
@@ -54,23 +56,23 @@ async function inicializarBanco() {
       );
     `);
 
-    // Tabela de itens
+    // Tabela de itens (com coluna imagem do tipo TEXT)
     await pool.query(`
       CREATE TABLE IF NOT EXISTS itens (
         id INT AUTO_INCREMENT PRIMARY KEY,
         titulo VARCHAR(150) NOT NULL,
         descricao TEXT,
         status VARCHAR(50) DEFAULT 'disponivel',
-        imagem VARCHAR(255),
+        imagem TEXT,
         criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
 
-    // Tenta adicionar a coluna imagem caso a tabela itens já existisse sem ela
+    // Garante que a coluna imagem aceite qualquer tamanho se a tabela já existia
     try {
-      await pool.query(`ALTER TABLE itens ADD COLUMN imagem VARCHAR(255);`);
+      await pool.query(`ALTER TABLE itens MODIFY COLUMN imagem TEXT;`);
     } catch (err) {
-      // Ignora o erro caso a coluna já exista
+      // Ignora caso não seja necessário alterar
     }
 
     console.log('Base de dados e tabelas inicializadas com sucesso!');
