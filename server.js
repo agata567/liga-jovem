@@ -66,6 +66,13 @@ async function inicializarBanco() {
       );
     `);
 
+    // Tenta adicionar a coluna imagem caso a tabela itens já existisse sem ela
+    try {
+      await pool.query(`ALTER TABLE itens ADD COLUMN imagem VARCHAR(255);`);
+    } catch (err) {
+      // Ignora o erro caso a coluna já exista
+    }
+
     console.log('Base de dados e tabelas inicializadas com sucesso!');
   } catch (error) {
     console.error('Erro ao inicializar a base de dados:', error);
@@ -144,7 +151,7 @@ app.post('/api/itens', upload.single('imagem'), async (req, res) => {
     );
     res.status(201).json({ message: 'Item registado com sucesso!', id: result.insertId });
   } catch (error) {
-    console.error('Erro ao inserir item:', error);
+    console.error('Erro detalhado do MySQL ao inserir item:', error);
     res.status(500).json({ error: 'Erro ao guardar o item no banco de dados' });
   }
 });
