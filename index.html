@@ -35,9 +35,8 @@
   </main>
 
   <script>
-    // IMPORTANTE: Altere para a URL do seu servidor no Render quando for publicar no GitHub Pages
-    // Exemplo: const API_BASE = 'https://liga-jovem.onrender.com';
-    const API_BASE = 'http://localhost:3001';
+    // URL do servidor no Render ativada para o GitHub Pages
+    const API_BASE = 'https://liga-jovem.onrender.com';
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -85,7 +84,7 @@
         `).join('');
       } catch (err) {
         console.error('Erro ao carregar itens:', err);
-        container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível. Verifique se o backend está a rodar.</p>';
+        container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível. Aguarde alguns instantes se o Render estiver a inicializar.</p>';
       }
     }
 
@@ -125,7 +124,8 @@
         container.innerHTML = '<p style="color: var(--danger-red);">Erro ao carregar lista de utilizadores.</p>';
       }
     }
-async function apagarItem(id) {
+
+    async function apagarItem(id) {
       if (!confirm('Tem a certeza de que deseja apagar este item?')) return;
 
       try {
