@@ -122,6 +122,17 @@ app.post('/api/utilizadores', async (req, res) => {
   }
 });
 
+app.delete('/api/utilizadores/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM utilizadores WHERE id = ?', [id]);
+    res.json({ message: 'Utilizador eliminado com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao eliminar utilizador:', error);
+    res.status(500).json({ error: 'Erro ao eliminar o utilizador na base de dados' });
+  }
+});
+
 /* ==========================================================================
    ROTAS DE ITENS
    ========================================================================== */
@@ -155,6 +166,17 @@ app.post('/api/itens', upload.single('imagem'), async (req, res) => {
   } catch (error) {
     console.error('Erro detalhado do MySQL ao inserir item:', error);
     res.status(500).json({ error: 'Erro ao guardar o item no banco de dados' });
+  }
+});
+
+app.delete('/api/itens/:id', async (req, res) => {
+  const { id } = req.params;
+  try {
+    await pool.query('DELETE FROM itens WHERE id = ?', [id]);
+    res.json({ message: 'Item eliminado com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao eliminar item:', error);
+    res.status(500).json({ error: 'Erro ao eliminar o item na base de dados' });
   }
 });
 
