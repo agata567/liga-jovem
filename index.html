@@ -35,8 +35,9 @@
   </main>
 
   <script>
-    // URL do backend no Render configurada!
-    const API_BASE = 'https://liga-jovem.onrender.com';
+    // IMPORTANTE: Altere para a URL do seu servidor no Render quando for publicar no GitHub Pages
+    // Exemplo: const API_BASE = 'https://liga-jovem.onrender.com';
+    const API_BASE = 'http://localhost:3001';
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -54,8 +55,8 @@
 
       try {
         const res = await fetch(`${API_BASE}/api/itens`);
-        if (!res.ok) throw new Error('Erro na resposta do servidor');
-
+        if (!res.ok) throw new Error('Erro ao ligar ao servidor');
+        
         const itens = await res.json();
 
         if (!Array.isArray(itens) || itens.length === 0) {
@@ -84,7 +85,7 @@
         `).join('');
       } catch (err) {
         console.error('Erro ao carregar itens:', err);
-        container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível. Se for o primeiro acesso, aguarde alguns segundos para o servidor no Render inicializar.</p>';
+        container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível. Verifique se o backend está a rodar.</p>';
       }
     }
 
@@ -94,7 +95,7 @@
 
       try {
         const res = await fetch(`${API_BASE}/api/utilizadores`);
-        if (!res.ok) throw new Error('Erro na resposta do servidor');
+        if (!res.ok) throw new Error('Erro ao ligar ao servidor');
 
         const utilizadores = await res.json();
 
@@ -133,11 +134,11 @@
         if (res.ok) {
           carregarItens();
         } else {
-          alert('Erro ao apagar o item no servidor.');
+          alert('Erro ao apagar o item.');
         }
       } catch (err) {
         console.error('Erro ao apagar item:', err);
-        alert('Erro ao ligar ao servidor para apagar o item.');
+        alert('Erro ao ligar ao servidor.');
       }
     }
 
@@ -149,11 +150,11 @@
         if (res.ok) {
           carregarUtilizadores();
         } else {
-          alert('Erro ao apagar o utilizador no servidor.');
+          alert('Erro ao apagar o utilizador.');
         }
       } catch (err) {
         console.error('Erro ao apagar utilizador:', err);
-        alert('Erro ao ligar ao servidor para apagar o utilizador.');
+        alert('Erro ao ligar ao servidor.');
       }
     }
 
