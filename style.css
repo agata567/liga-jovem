@@ -1,28 +1,20 @@
 /* ==========================================================================
-   Variáveis e Temas Globais
+   PALETA CÍVICO-MILITAR (Azul Marinho, Branco, Preto e Cinza)
    ========================================================================== */
 :root {
-  --primary-color: #4f46e5;
-  --primary-hover: #4338ca;
-  --bg-color: #f8fafc;
-  --card-bg: #ffffff;
-  --text-main: #0f172a;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
-  
-  --status-available-bg: #fef2f2;
-  --status-available-text: #dc2626;
-  --status-rescued-bg: #f0fdf4;
-  --status-rescued-text: #16a34a;
-
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --radius: 12px;
+  --military-blue: #1b365d;
+  --military-blue-hover: #0f2341;
+  --dark-black: #0f172a;
+  --gray-light: #f8fafc;
+  --gray-border: #cbd5e1;
+  --gray-text: #475569;
+  --white: #ffffff;
+  --danger-red: #991b1b;
+  --danger-hover: #7f1d1d;
+  --radius: 6px;
+  --shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
 }
 
-/* ==========================================================================
-   Reset e Estilos Base
-   ========================================================================== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -31,191 +23,247 @@
 }
 
 body {
-  background-color: var(--bg-color);
-  color: var(--text-main);
+  background-color: var(--gray-light);
+  color: var(--dark-black);
   line-height: 1.5;
-  padding: 20px;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
-/* ==========================================================================
-   Cabeçalho
-   ========================================================================== */
+/* Faixa Superior Institucional */
+.top-bar {
+  background-color: var(--dark-black);
+  color: var(--white);
+  padding: 6px 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Cabeçalho Principal */
 header {
+  background-color: var(--military-blue);
+  color: var(--white);
+  padding: 24px 20px;
+  box-shadow: var(--shadow);
+}
+
+.header-container {
+  max-width: 1000px;
+  margin: 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 2px solid var(--border-color);
 }
 
-h1 {
-  font-size: 1.8rem;
-  color: var(--text-main);
+header h1 {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+header p {
+  font-size: 0.85rem;
+  opacity: 0.85;
+}
+
+.btn-header {
+  background-color: var(--white);
+  color: var(--military-blue);
+  padding: 10px 18px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background-color 0.2s;
+}
+
+.btn-header:hover {
+  background-color: #e2e8f0;
+}
+
+/* Conteúdo Principal */
+main {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 0 20px;
+}
+
+.section-title {
+  font-size: 1.25rem;
+  color: var(--military-blue);
+  border-bottom: 2px solid var(--military-blue);
+  padding-bottom: 6px;
+  margin-bottom: 20px;
+  text-transform: uppercase;
   font-weight: 700;
 }
 
-/* ==========================================================================
-   Botões e Links
-   ========================================================================== */
-.btn {
-  display: inline-block;
-  background-color: var(--primary-color);
-  color: white;
-  padding: 10px 18px;
-  border-radius: 8px;
-  text-decoration: none;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.1s ease;
-}
-
-.btn:hover {
-  background-color: var(--primary-hover);
-}
-
-.btn:active {
-  transform: scale(0.98);
-}
-
-/* ==========================================================================
-   Cartões de Itens e Utilizadores
-   ========================================================================== */
-#lista-itens, #listaItens, #listaUtilizadores {
-  display: grid;
-  gap: 16px;
-}
-
-.card, .item-card {
-  background-color: var(--card-bg);
+/* Banner Informativo */
+.info-banner {
+  background-color: var(--white);
+  border-left: 5px solid var(--military-blue);
   border-radius: var(--radius);
-  padding: 20px;
-  border: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow);
+  border-top: 1px solid var(--gray-border);
+  border-right: 1px solid var(--gray-border);
+  border-bottom: 1px solid var(--gray-border);
 }
 
-.card:hover, .item-card:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-2px);
+.info-banner p {
+  font-size: 0.9rem;
+  color: var(--gray-text);
 }
 
-.card h3, .item-card h3 {
-  font-size: 1.25rem;
-  margin-bottom: 8px;
-  color: var(--text-main);
+/* Grelha de Cartões */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
-.card p, .item-card p {
-  color: var(--text-muted);
-  margin-bottom: 6px;
-  font-size: 0.95rem;
+.card {
+  background-color: var(--white);
+  border: 1px solid var(--gray-border);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.card img, .item-card img {
+/* Ajuste de Imagem Contida e Visível */
+.card-img-wrapper {
   width: 100%;
-  max-height: 200px;
-  object-fit: cover;
-  border-radius: 8px;
+  height: 180px;
+  border-radius: 4px;
+  overflow: hidden;
+  background-color: #f1f5f9;
+  margin-bottom: 12px;
+  border: 1px solid var(--gray-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-img-wrapper img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.card h3 {
+  font-size: 1.1rem;
+  color: var(--dark-black);
+  margin-bottom: 6px;
+}
+
+.card p {
+  color: var(--gray-text);
+  font-size: 0.9rem;
   margin-bottom: 12px;
 }
 
-/* ==========================================================================
-   Badges e Status
-   ========================================================================== */
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 12px;
+  border-top: 1px dashed var(--gray-border);
+}
+
 .badge {
-  background-color: #e0e7ff;
-  color: var(--primary-color);
   padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 700;
   text-transform: uppercase;
-  display: inline-block;
 }
 
 .status-disponivel {
-  background-color: var(--status-available-bg);
-  color: var(--status-available-text);
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  background-color: #e0f2fe;
+  color: #0369a1;
+  border: 1px solid #bae6fd;
 }
 
 .status-resgatado {
-  background-color: var(--status-rescued-bg);
-  color: var(--status-rescued-text);
-  padding: 3px 8px;
-  border-radius: 6px;
-  font-size: 0.85rem;
+  background-color: #f1f5f9;
+  color: #475569;
+  border: 1px solid #cbd5e1;
 }
 
-/* ==========================================================================
-   Formulários e Inputs
-   ========================================================================== */
-.edit-form, form {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px dashed var(--border-color);
+/* Botão de Apagar */
+.btn-delete {
+  background-color: transparent;
+  color: var(--danger-red);
+  border: 1px solid var(--danger-red);
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-delete:hover {
+  background-color: var(--danger-red);
+  color: var(--white);
+}
+
+/* Formulários */
+.form-container {
+  background-color: var(--white);
+  padding: 24px;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-border);
+  box-shadow: var(--shadow);
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 label {
   display: block;
-  font-size: 0.875rem;
   font-weight: 600;
-  margin-bottom: 4px;
-  color: var(--text-main);
+  margin-bottom: 6px;
+  color: var(--dark-black);
+  font-size: 0.9rem;
 }
 
 input, select, textarea {
   width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: #fff;
+  padding: 10px;
+  margin-bottom: 16px;
+  border: 1px solid var(--gray-border);
+  border-radius: 4px;
   font-size: 0.95rem;
-  outline: none;
-  transition: border-color 0.2s ease;
+  background-color: var(--white);
 }
 
 input:focus, select:focus, textarea:focus {
-  border-color: var(--primary-color);
+  outline: none;
+  border-color: var(--military-blue);
 }
 
 button[type="submit"] {
   width: 100%;
-  background-color: var(--primary-color);
-  color: white;
-  padding: 10px;
+  background-color: var(--military-blue);
+  color: var(--white);
+  padding: 12px;
   border: none;
-  border-radius: 6px;
-  font-weight: 600;
+  border-radius: 4px;
+  font-weight: 700;
+  font-size: 1rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background-color 0.2s;
 }
 
 button[type="submit"]:hover {
-  background-color: var(--primary-hover);
+  background-color: var(--military-blue-hover);
 }
 
 button[type="submit"]:disabled {
-  background-color: #a5b4fc;
+  background-color: var(--gray-border);
   cursor: not-allowed;
-}
-
-.btn-delete {
-  background: none;
-  border: none;
-  font-size: 1.2rem;
-  cursor: pointer;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
-}
-
-.btn-delete:hover {
-  opacity: 1;
 }

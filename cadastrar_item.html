@@ -7,78 +7,79 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+  <div class="top-bar">
+    Escola Cívico-Militar • Seção de Achados e Perdidos
+  </div>
+
   <header>
-    <h1>Cadastrar Novo Item</h1>
-    <a href="index.html" class="btn">Voltar</a>
+    <div class="header-container">
+      <div>
+        <h1>Cadastrar Novo Item</h1>
+        <p>Registe objetos encontrados nas instalações escolares</p>
+      </div>
+      <a href="index.html" class="btn-header">Voltar à Lista</a>
+    </div>
   </header>
 
   <main>
-    <form id="formItem" enctype="multipart/form-data">
-      <label for="titulo">Título do Item *</label>
-      <input type="text" id="titulo" name="titulo" required placeholder="Ex: Casaco de Frio">
+    <div class="form-container">
+      <form id="formCadastro">
+        <label for="titulo">Título do Item *</label>
+        <input type="text" id="titulo" name="titulo" placeholder="Ex: Casaco azul, Relógio de pulso..." required>
 
-      <label for="descricao">Descrição</label>
-      <textarea id="descricao" name="descricao" rows="4" placeholder="Detalhes sobre o item..."></textarea>
+        <label for="descricao">Descrição</label>
+        <textarea id="descricao" name="descricao" rows="4" placeholder="Detalhes sobre o item, local onde foi encontrado..."></textarea>
 
-      <label for="status">Estado</label>
-      <select id="status" name="status">
-        <option value="disponivel">Disponível</option>
-        <option value="resgatado">Resgatado</option>
-      </select>
+        <label for="status">Estado</label>
+        <select id="status" name="status">
+          <option value="disponível">Disponível</option>
+          <option value="resgatado">Resgatado</option>
+        </select>
 
-      <label for="imagem">Imagem do Item</label>
-      <input type="file" id="imagem" name="imagem" accept="image/*">
+        <label for="imagem">Imagem do Item</label>
+        <input type="file" id="imagem" name="imagem" accept="image/*">
 
-      <button type="submit" id="btnSubmit">Guardar Item</button>
-    </form>
+        <button type="submit" id="btnSubmit">Cadastrar Item</button>
+      </form>
+    </div>
   </main>
 
   <script>
-    // URL apontando para a API local na sua máquina
-    const API_URL = 'http://localhost:3001/api/itens';
-    const form = document.getElementById('formItem');
+    // IMPORTANTE: Altere para a URL do seu servidor no Render quando for publicar no GitHub Pages
+    // Exemplo: const API_BASE = 'https://liga-jovem.onrender.com';
+    const API_BASE = 'http://localhost:3001';
+
+    const form = document.getElementById('formCadastro');
     const btnSubmit = document.getElementById('btnSubmit');
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
 
-      const titulo = document.getElementById('titulo').value.trim();
-      if (!titulo) {
-        alert('Por favor, introduza o título do item.');
-        return;
-      }
-
       btnSubmit.disabled = true;
-      const textoOriginal = btnSubmit.textContent;
-      btnSubmit.textContent = 'A guardar...';
+      btnSubmit.innerText = 'A guardar...';
 
       const formData = new FormData(form);
 
       try {
-        const response = await fetch(API_URL, {
+        const res = await fetch(`${API_BASE}/api/itens`, {
           method: 'POST',
           body: formData
         });
 
-        let dados;
-        try {
-          dados = await response.json();
-        } catch (e) {
-          dados = { error: 'Resposta inválida do servidor.' };
-        }
-
-        if (response.ok) {
-          alert(dados.message || 'Item registado com sucesso!');
+        if (res.ok) {
+          alert('Item cadastrado com sucesso!');
           window.location.href = 'index.html';
         } else {
-          alert(`Ocorreu um erro: ${dados.error || 'Erro desconhecido'}`);
+          const errData = await res.json().catch(() => ({}));
+          alert(errData.error || 'Erro ao cadastrar o item.');
         }
       } catch (err) {
-        console.error('Erro ao ligar ao servidor:', err);
-        alert('Servidor indisponível. Verifique se o backend está a rodar.');
+        console.error('Erro na submissão:', err);
+        alert('Servidor indisponível. Verifique se o backend está a rodar e se o endereço API_BASE está correto.');
       } finally {
         btnSubmit.disabled = false;
-        btnSubmit.textContent = textoOriginal;
+        btnSubmit.innerText = 'Cadastrar Item';
       }
     });
   </script>
