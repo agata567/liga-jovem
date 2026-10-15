@@ -35,9 +35,8 @@
   </main>
 
   <script>
-    // IMPORTANTE: Altere para a URL do seu servidor no Render quando for publicar no GitHub Pages
-    // Exemplo: const API_BASE = 'https://liga-jovem.onrender.com';
-    const API_BASE = 'http://localhost:3001';
+    // URL exata do Render
+    const API_BASE = 'https://liga-jovem.onrender.com';
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -55,8 +54,8 @@
 
       try {
         const res = await fetch(`${API_BASE}/api/itens`);
-        if (!res.ok) throw new Error('Erro ao ligar ao servidor');
-        
+        if (!res.ok) throw new Error('Erro na resposta do servidor');
+
         const itens = await res.json();
 
         if (!Array.isArray(itens) || itens.length === 0) {
@@ -85,7 +84,7 @@
         `).join('');
       } catch (err) {
         console.error('Erro ao carregar itens:', err);
-        container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível. Verifique se o backend está a rodar.</p>';
+        container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível no momento.</p>';
       }
     }
 
@@ -95,7 +94,7 @@
 
       try {
         const res = await fetch(`${API_BASE}/api/utilizadores`);
-        if (!res.ok) throw new Error('Erro ao ligar ao servidor');
+        if (!res.ok) throw new Error('Erro na resposta do servidor');
 
         const utilizadores = await res.json();
 
@@ -134,11 +133,12 @@
         if (res.ok) {
           carregarItens();
         } else {
-          alert('Erro ao apagar o item.');
+          const errData = await res.json().catch(() => ({}));
+          alert(errData.error || 'Erro ao apagar o item no servidor.');
         }
       } catch (err) {
         console.error('Erro ao apagar item:', err);
-        alert('Erro ao ligar ao servidor.');
+        alert('Erro ao ligar ao servidor do Render.');
       }
     }
 
@@ -150,11 +150,12 @@
         if (res.ok) {
           carregarUtilizadores();
         } else {
-          alert('Erro ao apagar o utilizador.');
+          const errData = await res.json().catch(() => ({}));
+          alert(errData.error || 'Erro ao apagar o utilizador no servidor.');
         }
       } catch (err) {
         console.error('Erro ao apagar utilizador:', err);
-        alert('Erro ao ligar ao servidor.');
+        alert('Erro ao ligar ao servidor do Render.');
       }
     }
 
