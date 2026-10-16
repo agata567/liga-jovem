@@ -9,19 +9,21 @@ const crypto = require('crypto');
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Garante a existência da pasta de uploads de forma segura
-if (!fs.existsSync('./uploads')) {
-  fs.mkdirSync('./uploads', { recursive: true });
+// Garante a existência da pasta de uploads
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+  fs.mkdirSync(uploadDir, { recursive: true });
 }
 
-// Servir arquivos estáticos da pasta uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Servir ficheiros estáticos da pasta uploads
+app.use('/uploads', express.static(uploadDir));
 
-// Configuração do Multer gerando nomes curtos e únicos (evita estourar limite no banco)
+// Configuração do Multer com nomes únicos para ficheiros
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
     const nomeUnico = Date.now() + '-' + crypto.randomBytes(4).toString('hex');
@@ -29,21 +31,36 @@ const storage = multer.diskStorage({
     cb(null, nomeUnico + extensao);
   }
 });
-const upload = multer({ storage });
 
-// Configuração da base de dados (lê diretamente do ambiente do Render)
-const dbConfig = {
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // Limite de 5MB
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = /jpeg|jpg|png|gif|webp/;
+    const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
+    const mimetype = allowedTypes.test(file.mimetype);
+
+    if (extname && mimetype) {
+      return cb(null, true);
+    }
+    cb(new Error('Apenas ficheiros de imagem são permitidos!'));
+  }
+});
+
+// Configuração da base de dados MySQL (lê do ambiente do Render)
+const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   port: Number(process.env.DB_PORT) || 3306,
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASSWORD || 'root',
+  password: process.env.DB_PASSWORD || '',
   database: process.env.DB_NAME || 'liga_jovem',
-  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false
-};
+  ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
-const pool = mysql.createPool(dbConfig);
-
-// Inicialização das tabelas na base de dados
+// Inicialização automática das tabelas na base de dados
 async function inicializarBanco() {
   try {
     // Tabela de utilizadores
@@ -56,7 +73,7 @@ async function inicializarBanco() {
       );
     `);
 
-    // Tabela de itens (com coluna imagem do tipo TEXT)
+    // Tabela de itens
     await pool.query(`
       CREATE TABLE IF NOT EXISTS itens (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -68,11 +85,11 @@ async function inicializarBanco() {
       );
     `);
 
-    // Garante que a coluna imagem aceite qualquer tamanho se a tabela já existia
+    // Garante tipo TEXT para a coluna imagem caso a tabela já existisse
     try {
       await pool.query(`ALTER TABLE itens MODIFY COLUMN imagem TEXT;`);
     } catch (err) {
-      // Ignora caso não seja necessário alterar
+      // Ignora erro caso a alteração não seja necessária
     }
 
     console.log('Base de dados e tabelas inicializadas com sucesso!');
@@ -81,25 +98,27 @@ async function inicializarBanco() {
   }
 }
 
-// Rota inicial de verificação
+// Rota de status/teste
 app.get('/', (req, res) => {
-  res.send('API Liga Jovem a rodar com sucesso!');
+  res.send('API Liga Jovem a rodar com sucesso no Render!');
 });
 
 /* ==========================================================================
    ROTAS DE UTILIZADORES
    ========================================================================== */
 
+// Listar Utilizadores
 app.get('/api/utilizadores', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM utilizadores ORDER BY criado_em DESC');
     res.json(rows);
   } catch (error) {
     console.error('Erro ao procurar utilizadores:', error);
-    res.status(500).json({ error: 'Erro interno do servidor' });
+    res.status(500).json({ error: 'Erro ao carregar lista de utilizadores.' });
   }
 });
 
+// Cadastrar Utilizador
 app.post('/api/utilizadores', async (req, res) => {
   const { nome, email } = req.body;
 
@@ -118,18 +137,29 @@ app.post('/api/utilizadores', async (req, res) => {
       return res.status(400).json({ error: 'Este e-mail já está registado.' });
     }
     console.error('Erro ao inserir utilizador:', error);
-    res.status(500).json({ error: 'Erro ao guardar na base de dados' });
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
   }
 });
 
+// Eliminar Utilizador
 app.delete('/api/utilizadores/:id', async (req, res) => {
-  const { id } = req.params;
+  const userId = parseInt(req.params.id, 10);
+
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'ID de utilizador inválido.' });
+  }
+
   try {
-    await pool.query('DELETE FROM utilizadores WHERE id = ?', [id]);
+    const [result] = await pool.query('DELETE FROM utilizadores WHERE id = ?', [userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Utilizador não encontrado para exclusão.' });
+    }
+
     res.json({ message: 'Utilizador eliminado com sucesso!' });
   } catch (error) {
     console.error('Erro ao eliminar utilizador:', error);
-    res.status(500).json({ error: 'Erro ao eliminar o utilizador na base de dados' });
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
   }
 });
 
@@ -137,20 +167,22 @@ app.delete('/api/utilizadores/:id', async (req, res) => {
    ROTAS DE ITENS
    ========================================================================== */
 
+// Listar Itens
 app.get('/api/itens', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM itens ORDER BY criado_em DESC');
     res.json(rows);
   } catch (error) {
     console.error('Erro ao procurar itens:', error);
-    res.status(500).json({ error: 'Erro ao procurar itens no servidor' });
+    res.status(500).json({ error: 'Erro ao procurar itens no servidor.' });
   }
 });
 
+// Cadastrar Item (com Upload de Imagem)
 app.post('/api/itens', upload.single('imagem'), async (req, res) => {
   const { titulo, descricao, status } = req.body;
 
-  if (!titulo) {
+  if (!titulo || titulo.trim() === '') {
     return res.status(400).json({ error: 'O título do item é obrigatório.' });
   }
 
@@ -165,22 +197,43 @@ app.post('/api/itens', upload.single('imagem'), async (req, res) => {
     res.status(201).json({ message: 'Item registado com sucesso!', id: result.insertId });
   } catch (error) {
     console.error('Erro detalhado do MySQL ao inserir item:', error);
-    res.status(500).json({ error: 'Erro ao guardar o item no banco de dados' });
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
   }
 });
 
+// Eliminar Item
 app.delete('/api/itens/:id', async (req, res) => {
-  const { id } = req.params;
+  const itemId = parseInt(req.params.id, 10);
+
+  if (isNaN(itemId)) {
+    return res.status(400).json({ error: 'ID de item inválido.' });
+  }
+
   try {
-    await pool.query('DELETE FROM itens WHERE id = ?', [id]);
+    // Procura imagem guardada para remoção do sistema de ficheiros
+    const [rows] = await pool.query('SELECT imagem FROM itens WHERE id = ?', [itemId]);
+    if (rows.length > 0 && rows[0].imagem) {
+      const fullPath = path.join(__dirname, rows[0].imagem);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
+    }
+
+    const [result] = await pool.query('DELETE FROM itens WHERE id = ?', [itemId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Item não encontrado para exclusão.' });
+    }
+
     res.json({ message: 'Item eliminado com sucesso!' });
   } catch (error) {
     console.error('Erro ao eliminar item:', error);
-    res.status(500).json({ error: 'Erro ao eliminar o item na base de dados' });
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
   }
 });
 
-const PORT = process.env.PORT || 3001;
+// Inicializar porta do servidor
+const PORT = process.env.PORT || 10000;
 
 inicializarBanco().then(() => {
   app.listen(PORT, () => {
