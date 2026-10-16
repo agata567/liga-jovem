@@ -137,3 +137,109 @@ app.post('/api/utilizadores', async (req, res) => {
     );
     res.status(201).json({ message: 'Utilizador registado com sucesso!', id: result.insertId });
   } catch (error) {
+    if (error.code === 'ER_DUP_ENTRY') {
+      return res.status(400).json({ error: 'Este e-mail já está registado.' });
+    }
+    console.error('Erro ao inserir utilizador:', error);
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
+  }
+});
+
+// Eliminar Utilizador
+app.delete('/api/utilizadores/:id', async (req, res) => {
+  const userId = parseInt(req.params.id, 10);
+
+  if (isNaN(userId)) {
+    return res.status(400).json({ error: 'ID de utilizador inválido.' });
+  }
+
+  try {
+    const [result] = await pool.query('DELETE FROM utilizadores WHERE id = ?', [userId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Utilizador não encontrado para exclusão.' });
+    }
+
+    res.json({ message: 'Utilizador eliminado com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao eliminar utilizador:', error);
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
+  }
+});
+
+/* ==========================================================================
+   ROTAS DE ITENS
+   ========================================================================== */
+
+// Listar Itens
+app.get('/api/itens', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM itens ORDER BY criado_em DESC');
+    res.json(rows);
+  } catch (error) {
+    console.error('Erro ao procurar itens:', error);
+    res.status(500).json({ error: 'Erro ao procurar itens no servidor.' });
+  }
+});
+
+// Cadastrar Item (com Upload de Imagem)
+app.post('/api/itens', upload.single('imagem'), async (req, res) => {
+  const { titulo, descricao, status } = req.body;
+
+  if (!titulo || titulo.trim() === '') {
+    return res.status(400).json({ error: 'O título do item é obrigatório.' });
+  }
+
+  const imagemUrl = req.file ? `/uploads/${req.file.filename}` : null;
+  const itemStatus = status || 'disponivel';
+
+  try {
+    const [result] = await pool.query(
+      'INSERT INTO itens (titulo, descricao, status, imagem) VALUES (?, ?, ?, ?)',
+      [titulo, descricao || '', itemStatus, imagemUrl]
+    );
+    res.status(201).json({ message: 'Item registado com sucesso!', id: result.insertId });
+  } catch (error) {
+    console.error('Erro detalhado do MySQL ao inserir item:', error);
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
+  }
+});
+
+// Eliminar Item
+app.delete('/api/itens/:id', async (req, res) => {
+  const itemId = parseInt(req.params.id, 10);
+
+  if (isNaN(itemId)) {
+    return res.status(400).json({ error: 'ID de item inválido.' });
+  }
+
+  try {
+    const [rows] = await pool.query('SELECT imagem FROM itens WHERE id = ?', [itemId]);
+    if (rows.length > 0 && rows[0].imagem) {
+      const fullPath = path.join(__dirname, rows[0].imagem);
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath);
+      }
+    }
+
+    const [result] = await pool.query('DELETE FROM itens WHERE id = ?', [itemId]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Item não encontrado para exclusão.' });
+    }
+
+    res.json({ message: 'Item eliminado com sucesso!' });
+  } catch (error) {
+    console.error('Erro ao eliminar item:', error);
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
+  }
+});
+
+// Porta do servidor
+const PORT = process.env.PORT || 10000;
+
+inicializarBanco().then(() => {
+  app.listen(PORT, () => {
+    console.log(`Servidor a rodar na porta ${PORT}`);
+  });
+});
