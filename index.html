@@ -5,6 +5,30 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Liga Jovem - Achados e Perdidos</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Estilos auxiliares para os botões e badges */
+    .btn-status {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: bold;
+      color: white;
+      transition: background 0.2s;
+    }
+    .btn-status.status-disponivel {
+      background-color: #28a745;
+    }
+    .btn-status.status-resgatado {
+      background-color: #6c757d;
+    }
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+  </style>
 </head>
 <body>
 
@@ -29,15 +53,10 @@
 
     <h2 class="section-title">Objetos Registados</h2>
     <div id="listaItens" class="grid-container"></div>
-
-    <h2 class="section-title" style="margin-top: 40px;">Utilizadores Registados</h2>
-    <div id="listaUtilizadores" class="grid-container"></div>
   </main>
 
   <script>
-    // IMPORTANTE: Altere para a URL do seu servidor no Render quando for publicar no GitHub Pages
-    // Exemplo: const API_BASE = 'https://liga-jovem.onrender.com';
-    const API_BASE =  'https://liga-jovem.onrender.com';;
+    const API_BASE = 'https://liga-jovem.onrender.com';
 
     function escapeHTML(str) {
       if (!str) return '';
@@ -64,68 +83,61 @@
           return;
         }
 
-        container.innerHTML = itens.map(item => `
-          <div class="card">
-            <div>
+        container.innerHTML = itens.map(item => {
+          const proximoStatus = item.status === 'disponivel' ? 'resgatado' : 'disponivel';
+          const textoBotaoStatus = item.status === 'disponivel' ? 'Resgatar' : 'Tornar Disponível';
+
+          return `
+            <div class="card">
+              <div>
+                <h3>${escapeHTML(item.titulo)}</h3>
+                <p>${escapeHTML(item.descricao || 'Sem descrição informada.')}</p>
+                <p><strong>Status:</strong> ${escapeHTML(item.status)}</p>
+              </div>
+
+              <div class="card-footer">
+                <button class="btn-status status-${item.status}" onclick="alterarStatus(${item.id}, '${proximoStatus}')">
+                  ${textoBotaoStatus}
+                </button>
+                <button class="btn-delete" onclick="apagarItem(${item.id})">Apagar</button>
+              </div>
+
               ${item.imagem ? `
                 <div class="card-img-wrapper">
                   <img src="${API_BASE}${item.imagem}" alt="${escapeHTML(item.titulo)}">
                 </div>
               ` : ''}
-              <h3>${escapeHTML(item.titulo)}</h3>
-              <p>${escapeHTML(item.descricao || 'Sem descrição informada.')}</p>
             </div>
-            <div class="card-footer">
-              <span class="badge ${item.status === 'resgatado' ? 'status-resgatado' : 'status-disponivel'}">
-                ${escapeHTML(item.status)}
-              </span>
-              <button class="btn-delete" onclick="apagarItem(${item.id})">Apagar</button>
-            </div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
       } catch (err) {
         console.error('Erro ao carregar itens:', err);
         container.innerHTML = '<p style="color: var(--danger-red);">Servidor indisponível. Aguarde alguns instantes se o Render estiver a inicializar.</p>';
       }
     }
 
-    async function carregarUtilizadores() {
-      const container = document.getElementById('listaUtilizadores');
-      if (!container) return;
-
+    async function alterarStatus(id, novoStatus) {
       try {
-        const res = await fetch(`${API_BASE}/api/utilizadores`);
-        if (!res.ok) throw new Error('Erro ao ligar ao servidor');
+        const res = await fetch(`${API_BASE}/api/itens/${id}/status`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ status: novoStatus })
+        });
 
-        const utilizadores = await res.json();
+        const data = await res.json().catch(() => ({}));
 
-        if (!Array.isArray(utilizadores) || utilizadores.length === 0) {
-          container.innerHTML = '<p style="color: var(--gray-text);">Nenhum utilizador registado no momento.</p>';
-          return;
+        if (res.ok) {
+          carregarItens();
+        } else {
+          alert(data.error || 'Erro ao alterar o status do item.');
         }
-
-        container.innerHTML = utilizadores.map(user => {
-          const dataCriacao = new Date(user.criado_em).toLocaleDateString('pt-PT');
-          return `
-            <div class="card">
-              <div>
-                <h3>${escapeHTML(user.nome)}</h3>
-                <p><strong>E-mail:</strong> ${escapeHTML(user.email)}</p>
-                <small style="color: var(--gray-text);">Registado em: ${dataCriacao}</small>
-              </div>
-              <div class="card-footer">
-                <span></span>
-                <button class="btn-delete" onclick="apagarUtilizador(${user.id})">Apagar</button>
-              </div>
-            </div>
-          `;
-        }).join('');
       } catch (err) {
-        console.error('Erro ao carregar utilizadores:', err);
-        container.innerHTML = '<p style="color: var(--danger-red);">Erro ao carregar lista de utilizadores.</p>';
+        console.error('Erro ao alterar status:', err);
+        alert('Erro ao ligar ao servidor do Render.');
       }
     }
-async function apagarItem(id) {
+
+    async function apagarItem(id) {
       if (!confirm('Tem a certeza de que deseja apagar este item?')) return;
 
       try {
@@ -133,7 +145,6 @@ async function apagarItem(id) {
         const data = await res.json().catch(() => ({}));
 
         if (res.ok) {
-          alert(data.message || 'Item apagado com sucesso!');
           carregarItens();
         } else {
           alert(data.error || 'Erro ao apagar o item no servidor.');
@@ -144,27 +155,7 @@ async function apagarItem(id) {
       }
     }
 
-    async function apagarUtilizador(id) {
-      if (!confirm('Tem a certeza de que deseja apagar este utilizador?')) return;
-
-      try {
-        const res = await fetch(`${API_BASE}/api/utilizadores/${id}`, { method: 'DELETE' });
-        const data = await res.json().catch(() => ({}));
-
-        if (res.ok) {
-          alert(data.message || 'Utilizador apagado com sucesso!');
-          carregarUtilizadores();
-        } else {
-          alert(data.error || 'Erro ao apagar o utilizador no servidor.');
-        }
-      } catch (err) {
-        console.error('Erro ao apagar utilizador:', err);
-        alert('Erro ao ligar ao servidor do Render.');
-      }
-    }
-
     carregarItens();
-    carregarUtilizadores();
   </script>
 </body>
 </html>
