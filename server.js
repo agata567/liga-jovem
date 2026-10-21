@@ -63,17 +63,7 @@ const pool = mysql.createPool({
 // Inicialização automática das tabelas com verificação de colunas
 async function inicializarBanco() {
   try {
-    // 1. Tabela de utilizadores
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS utilizadores (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        nome VARCHAR(100) NOT NULL,
-        email VARCHAR(100) UNIQUE NOT NULL,
-        criado_em TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      );
-    `);
-
-    // 2. Apaga a tabela antiga caso esteja sem a coluna 'titulo'
+    // 1. Apaga a tabela antiga caso esteja sem a coluna 'titulo'
     try {
       const [columns] = await pool.query(`SHOW COLUMNS FROM itens LIKE 'titulo';`);
       if (columns.length === 0) {
@@ -84,7 +74,7 @@ async function inicializarBanco() {
       // Tabela ainda não existe
     }
 
-    // 3. Cria a tabela de itens atualizada
+    // 2. Cria a tabela de itens atualizada
     await pool.query(`
       CREATE TABLE IF NOT EXISTS itens (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -96,7 +86,7 @@ async function inicializarBanco() {
       );
     `);
 
-    console.log('Base de dados e tabelas sincronizadas com sucesso!');
+    console.log('Base de dados e tabela de itens sincronizadas com sucesso!');
   } catch (error) {
     console.error('Erro ao inicializar a base de dados:', error);
   }
@@ -105,66 +95,6 @@ async function inicializarBanco() {
 // Rota de status/teste
 app.get('/', (req, res) => {
   res.send('API Liga Jovem a rodar com sucesso no Render!');
-});
-
-/* ==========================================================================
-   ROTAS DE UTILIZADORES
-   ========================================================================== */
-
-// Listar Utilizadores
-app.get('/api/utilizadores', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM utilizadores ORDER BY criado_em DESC');
-    res.json(rows);
-  } catch (error) {
-    console.error('Erro ao procurar utilizadores:', error);
-    res.status(500).json({ error: 'Erro ao carregar lista de utilizadores.' });
-  }
-});
-
-// Cadastrar Utilizador
-app.post('/api/utilizadores', async (req, res) => {
-  const { nome, email } = req.body;
-
-  if (!nome || !email) {
-    return res.status(400).json({ error: 'Nome e e-mail são obrigatórios.' });
-  }
-
-  try {
-    const [result] = await pool.query(
-      'INSERT INTO utilizadores (nome, email) VALUES (?, ?)',
-      [nome, email]
-    );
-    res.status(201).json({ message: 'Utilizador registado com sucesso!', id: result.insertId });
-  } catch (error) {
-    if (error.code === 'ER_DUP_ENTRY') {
-      return res.status(400).json({ error: 'Este e-mail já está registado.' });
-    }
-    console.error('Erro ao inserir utilizador:', error);
-    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
-  }
-});
-
-// Eliminar Utilizador
-app.delete('/api/utilizadores/:id', async (req, res) => {
-  const userId = parseInt(req.params.id, 10);
-
-  if (isNaN(userId)) {
-    return res.status(400).json({ error: 'ID de utilizador inválido.' });
-  }
-
-  try {
-    const [result] = await pool.query('DELETE FROM utilizadores WHERE id = ?', [userId]);
-
-    if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Utilizador não encontrado para exclusão.' });
-    }
-
-    res.json({ message: 'Utilizador eliminado com sucesso!' });
-  } catch (error) {
-    console.error('Erro ao eliminar utilizador:', error);
-    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
-  }
 });
 
 /* ==========================================================================
@@ -198,9 +128,44 @@ app.post('/api/itens', upload.single('imagem'), async (req, res) => {
       'INSERT INTO itens (titulo, descricao, status, imagem) VALUES (?, ?, ?, ?)',
       [titulo, descricao || '', itemStatus, imagemUrl]
     );
-    res.status(201).json({ message: 'Item registado com sucesso!', id: result.insertId });
+    res.status(201).json({ 
+      message: 'Item registado com sucesso!', 
+      id: result.insertId,
+      imagem: imagemUrl,
+      status: itemStatus
+    });
   } catch (error) {
     console.error('Erro detalhado do MySQL ao inserir item:', error);
+    res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
+  }
+});
+
+// Alterar Status do Item (Resgatar / Alterar para Disponível)
+app.patch('/api/itens/:id/status', async (req, res) => {
+  const itemId = parseInt(req.params.id, 10);
+  const { status } = req.body; // Espera receber { "status": "resgatado" } ou { "status": "disponivel" }
+
+  if (isNaN(itemId)) {
+    return res.status(400).json({ error: 'ID de item inválido.' });
+  }
+
+  if (!status) {
+    return res.status(400).json({ error: 'O novo status deve ser informado.' });
+  }
+
+  try {
+    const [result] = await pool.query(
+      'UPDATE itens SET status = ? WHERE id = ?',
+      [status, itemId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Item não encontrado para alteração de status.' });
+    }
+
+    res.json({ message: `Status do item atualizado para '${status}' com sucesso!`, id: itemId, status });
+  } catch (error) {
+    console.error('Erro ao atualizar status do item:', error);
     res.status(500).json({ error: 'Erro no banco de dados: ' + error.message });
   }
 });
