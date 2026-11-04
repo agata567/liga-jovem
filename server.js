@@ -97,6 +97,11 @@ app.get('/', (req, res) => {
   res.send('API Liga Jovem a rodar com sucesso no Render!');
 });
 
+// Rota de Health Check (para manter o Render acordado)
+app.get('/health', (req, res) => {
+  res.status(200).send('OK');
+});
+
 /* ==========================================================================
    ROTAS DE ITENS
    ========================================================================== */
